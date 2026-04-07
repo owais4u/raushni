@@ -37,13 +37,7 @@ This project uses a modern, cloud-native microservices architecture for scalabil
 - **CMS & AI:** Headless CMS (Strapi/Sanity) for content, and **Deepgram** for potential voice/AI integrations.
 
 ### High-Level Architecture
-```mermaid
-graph TD
-    User[User Browser] --> CDN[CloudFront CDN]
-    CDN --> LB[Load Balancer]
-    LB --> FE[Next.js Frontend Pods]
-    FE --> BEAPI[Node.js API Pods]
-    FE --> PyDoc[Python Document Service Pods]
-    BEAPI --> DB[(PostgreSQL RDS)]
-    BEAPI --> Redis[(Redis Cache)]
-    PyDoc --> S3[Object Storage (PDFs)]
+## C4 Model Architecture for Raushni Platform
+### Level 1: System Context Diagram
+![Context](https://github.com/user-attachments/assets/74c8f514-0935-42ac-b30f-799f65398604)
+
