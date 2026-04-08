@@ -87,14 +87,14 @@ This will start the Postgres DB, Redis, Backend, Python service, and Frontend.
 4. Or run services individually
 
   Backend (Node.js):
- ```bash
+  
        cd backend
        npm install
        npx prisma migrate dev --name init
        npm run dev
 
-Python Service:
- ```bash
+  Python Service:
+
       cd services/document_generator
       python -m venv venv
       source venv/bin/activate # On Windows use `venv\Scripts\activate`
