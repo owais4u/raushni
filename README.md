@@ -73,8 +73,9 @@ Follow these steps to get a development environment running.
     ```bash
     git clone https://github.com/owais4u/raushni.git
     cd raushni
-
-
+2. Set up environment variables
+   cp .env.example .env
+   # Edit .env with your database, API keys, etc.
 
 
 
