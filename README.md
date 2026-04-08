@@ -87,11 +87,11 @@ This will start the Postgres DB, Redis, Backend, Python service, and Frontend.
 4. Or run services individually
 
   Backend (Node.js):
-      ```bash 
+  ```bash
        cd backend
        npm install
        npx prisma migrate dev --name init
        npm run dev
-  Python Service:
+
  
 
