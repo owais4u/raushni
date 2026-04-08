@@ -81,8 +81,16 @@ Follow these steps to get a development environment running.
    
 3. Run with Docker Compose (Recommended)
 This will start the Postgres DB, Redis, Backend, Python service, and Frontend.
- ```bash 
+   ```bash 
    docker-compose up -d
 
+4. Or run services individually
+
+Backend (Node.js):
+   ```bash 
+   cd backend
+   npm install
+   npx prisma migrate dev --name init
+   npm run dev
 
 
