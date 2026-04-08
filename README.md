@@ -48,6 +48,9 @@ This project uses a modern, cloud-native microservices architecture for scalabil
 ![RComponant](https://github.com/user-attachments/assets/02a0369a-a0db-4a82-b77f-0f38602a66c7)
 
 ### Level 4: Kubernetes Deployment Diagram
+![RKDeployment](https://github.com/user-attachments/assets/2781ef1c-426a-4611-82de-b3a463a0fd46)
+
+
 
 
 
