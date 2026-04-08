@@ -51,6 +51,30 @@ This project uses a modern, cloud-native microservices architecture for scalabil
 ![RKDeployment](https://github.com/user-attachments/assets/2781ef1c-426a-4611-82de-b3a463a0fd46)
 
 
+**Data Flow:**
+1. User requests → CDN → Load Balancer
+2. Frontend pods handle UI rendering
+3. API requests go to Node.js backend
+4. Document generation requests go to Python service
+5. PDFs are stored in S3
+6. Database queries go through Redis cache
+
+## 🚀 Getting Started (Local Development)
+
+Follow these steps to get a development environment running.
+
+### Prerequisites
+- Node.js (v20+), Python (3.11+), Docker & Docker Compose
+- Git
+
+### Installation
+
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/owais4u/raushni.git
+    cd raushni
+
+
 
 
 
