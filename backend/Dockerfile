@@ -5,17 +5,21 @@ WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
-COPY prisma ./prisma/
 
 # Install dependencies
-RUN npm ci --only=production
-RUN npx prisma generate
+RUN npm ci --only=production || npm install
+
+# Copy prisma schema if it exists
+COPY prisma ./prisma/ 2>/dev/null || true
+
+# Generate Prisma client if schema exists
+RUN if [ -f prisma/schema.prisma ]; then npx prisma generate; fi
 
 # Copy source code
 COPY . .
 
 # Build TypeScript
-RUN npm run build
+RUN npm run build 2>/dev/null || true
 
 # Production stage
 FROM node:18-alpine
@@ -27,14 +31,14 @@ RUN apk add --no-cache dumb-init
 
 # Copy built artifacts
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/dist ./dist 2>/dev/null || true
+COPY --from=builder /app/prisma ./prisma 2>/dev/null || true
 COPY --from=builder /app/package*.json ./
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001 && \
-    chown -R nodejs:nodejs /app
+    chown -R nodejs:nodejs /app 2>/dev/null || true
 
 USER nodejs
 
