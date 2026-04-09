@@ -1,0 +1,10 @@
+# k8s/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: raushni-config
+  namespace: raushni
+data:
+  DATABASE_URL: postgresql://raushni_user:raushni_password@postgres:5432/raushni
+  REDIS_URL: redis://redis:6379
+  NEXT_PUBLIC_API_URL: http://backend:5000

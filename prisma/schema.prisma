@@ -1,0 +1,262 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String
+  role          Role      @default(STAFF)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  members       Member[]
+  donations     Donation[]
+  events        Event[]
+  projects      Project[]
+}
+
+model Member {
+  id            String    @id @default(cuid())
+  memberId      String    @unique
+  name          String
+  email         String
+  phone         String
+  address       String
+  designation   String
+  joinDate      DateTime
+  status        Status    @default(ACTIVE)
+  qrCode        String?
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Donation {
+  id            String    @id @default(cuid())
+  donationId    String    @unique
+  donorName     String
+  donorEmail    String
+  donorPhone    String
+  amount        Float
+  paymentMethod PaymentMethod
+  transactionId String    @unique
+  receiptNo     String    @unique
+  purpose       String
+  date          DateTime
+  status        Status    @default(PENDING)
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id])
+  createdAt     DateTime  @default(now())
+}
+
+model Event {
+  id            String    @id @default(cuid())
+  title         String
+  description   String
+  date          DateTime
+  location      String
+  capacity      Int
+  registered    Int       @default(0)
+  image         String?
+  status        Status    @default(ACTIVE)
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Project {
+  id            String    @id @default(cuid())
+  title         String
+  description   String
+  goal          Float
+  raised        Float     @default(0)
+  startDate     DateTime
+  endDate       DateTime
+  status        ProjectStatus @default(ACTIVE)
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  expenses      Expense[]
+}
+
+model Expense {
+  id            String    @id @default(cuid())
+  title         String
+  amount        Float
+  category      String
+  date          DateTime
+  receipt       String?
+  projectId     String?
+  project       Project?  @relation(fields: [projectId], references: [id])
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id])
+  createdAt     DateTime  @default(now())
+}
+
+model Crowdfunding {
+  id            String    @id @default(cuid())
+  title         String
+  description   String
+  goal          Float
+  raised        Float     @default(0)
+  endDate       DateTime
+  status        Status    @default(ACTIVE)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  donations     CrowdDonation[]
+}
+
+model CrowdDonation {
+  id            String    @id @default(cuid())
+  donorName     String
+  donorEmail    String
+  amount        Float
+  transactionId String    @unique
+  crowdfundingId String
+  crowdfunding  Crowdfunding @relation(fields: [crowdfundingId], references: [id])
+  createdAt     DateTime  @default(now())
+}
+
+model Internship {
+  id            String    @id @default(cuid())
+  title         String
+  description   String
+  requirements  String
+  duration      String
+  stipend       Float?
+  positions     Int
+  filled        Int       @default(0)
+  status        Status    @default(ACTIVE)
+  applications  InternApplication[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model InternApplication {
+  id            String    @id @default(cuid())
+  name          String
+  email         String
+  phone         String
+  resume        String
+  coverLetter   String?
+  status        ApplicationStatus @default(PENDING)
+  internshipId  String
+  internship    Internship @relation(fields: [internshipId], references: [id])
+  createdAt     DateTime  @default(now())
+}
+
+model Activity {
+  id            String    @id @default(cuid())
+  title         String
+  content       String
+  image         String?
+  date          DateTime
+  status        Status    @default(ACTIVE)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Enquiry {
+  id            String    @id @default(cuid())
+  name          String
+  email         String
+  phone         String
+  subject       String
+  message       String
+  status        EnquiryStatus @default(NEW)
+  response      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model News {
+  id            String    @id @default(cuid())
+  title         String
+  content       String
+  image         String?
+  publishedAt   DateTime
+  status        Status    @default(ACTIVE)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Designation {
+  id            String    @id @default(cuid())
+  name          String    @unique
+  description   String?
+  priority      Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Beneficiary {
+  id            String    @id @default(cuid())
+  beneficiaryId String    @unique
+  name          String
+  email         String?
+  phone         String
+  address       String
+  assistance    String
+  amount        Float?
+  date          DateTime
+  status        Status    @default(ACTIVE)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model AuditReport {
+  id            String    @id @default(cuid())
+  year          Int       @unique
+  reportUrl     String
+  financialSummary Json
+  uploadedAt    DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  STAFF
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum ProjectStatus {
+  ACTIVE
+  COMPLETED
+  SUSPENDED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  BANK_TRANSFER
+  UPI
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum EnquiryStatus {
+  NEW
+  IN_PROGRESS
+  RESOLVED
+}
