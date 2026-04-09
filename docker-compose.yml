@@ -1,3 +1,4 @@
+# docker-compose.yml
 services:
   postgres:
     image: postgres:15
@@ -12,11 +13,6 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - raushni_network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U raushni_user"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   redis:
     image: redis:7-alpine
@@ -25,26 +21,18 @@ services:
       - "6379:6379"
     networks:
       - raushni_network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   backend:
     build: ./backend
     container_name: raushni-backend
-    environment:
-      DATABASE_URL: postgresql://raushni_user:raushni_password@postgres:5432/raushni
-      REDIS_URL: redis://redis:6379
-      PORT: 5000
     ports:
       - "5000:5000"
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgresql://raushni_user:raushni_password@postgres:5432/raushni
+      PORT: 5000
     networks:
       - raushni_network
 
@@ -55,34 +43,16 @@ services:
       - "8000:8000"
     networks:
       - raushni_network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   frontend:
     build: ./frontend
     container_name: raushni-frontend
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:5000
     ports:
       - "3000:3000"
     depends_on:
       - backend
-    networks:
-      - raushni_network
-
-  nginx:
-    image: nginx:alpine
-    container_name: raushni-nginx
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - frontend
-      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:5000
     networks:
       - raushni_network
 

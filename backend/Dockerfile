@@ -1,5 +1,5 @@
 # backend/Dockerfile
-FROM node:18-alpine AS builder
+FROM node:18-alpine
 
 WORKDIR /app
 
@@ -7,42 +7,13 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production || npm install
-
-# Copy prisma schema if it exists
-COPY prisma ./prisma/ 2>/dev/null || true
-
-# Generate Prisma client if schema exists
-RUN if [ -f prisma/schema.prisma ]; then npx prisma generate; fi
+RUN npm install
 
 # Copy source code
 COPY . .
 
-# Build TypeScript
-RUN npm run build 2>/dev/null || true
-
-# Production stage
-FROM node:18-alpine
-
-WORKDIR /app
-
-# Install dumb-init for better signal handling
-RUN apk add --no-cache dumb-init
-
-# Copy built artifacts
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist 2>/dev/null || true
-COPY --from=builder /app/prisma ./prisma 2>/dev/null || true
-COPY --from=builder /app/package*.json ./
-
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001 && \
-    chown -R nodejs:nodejs /app 2>/dev/null || true
-
-USER nodejs
-
+# Expose port
 EXPOSE 5000
 
-ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "dist/server.js"]
+# Start the server
+CMD ["node", "src/server.js"]

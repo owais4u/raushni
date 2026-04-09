@@ -1,50 +1,22 @@
 # frontend/Dockerfile
-FROM node:18-alpine AS deps
+FROM node:18-alpine
 
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
-COPY prisma ./prisma/
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm install
 
-# Rebuild the source code only when needed
-FROM node:18-alpine AS builder
-
-WORKDIR /app
-
-COPY --from=deps /app/node_modules ./node_modules
+# Copy source code
 COPY . .
 
-# Build Next.js application
+# Build Next.js app
 RUN npm run build
 
-# Production image
-FROM node:18-alpine AS runner
-
-WORKDIR /app
-
-ENV NODE_ENV production
-
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nextjs -u 1001
-
-# Copy built application
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-
-# Copy prisma schema if needed
-COPY --from=builder /app/prisma ./prisma
-
-USER nextjs
-
+# Expose port
 EXPOSE 3000
 
-ENV PORT 3000
-
+# Start Next.js
 CMD ["npm", "start"]
