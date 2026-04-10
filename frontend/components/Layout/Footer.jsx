@@ -97,11 +97,11 @@ export default function Footer() {
             <div className="space-y-3">
               <div className="flex items-start gap-3">
                 <MapPin size={18} className="text-orange-400 mt-0.5" />
-                <p className="text-sm">123 NGO Street, Civil Lines, New Delhi - 110001</p>
+                <p className="text-sm">Rauzah Aparment, Bhatauna Road, Marwan Khurd Muzaffarpur Bihar - 843113</p>
               </div>
               <div className="flex items-center gap-3">
                 <Phone size={18} className="text-orange-400" />
-                <p className="text-sm">+91 123 456 7890</p>
+                <p className="text-sm">+91 997 3955 7600</p>
               </div>
               <div className="flex items-center gap-3">
                 <Mail size={18} className="text-orange-400" />
@@ -138,7 +138,7 @@ export default function Footer() {
             © {currentYear} Raushni Educational & Social Welfare Trust. All rights reserved.
           </p>
           <p className="text-xs mt-2 text-gray-500">
-            Registered under Section 8 of Companies Act, 2013 | 80G Tax Exempted
+            Registered under Section 8 of Companies Act, 2013 | 12A & 80G Tax Exempted
           </p>
         </div>
       </div>
