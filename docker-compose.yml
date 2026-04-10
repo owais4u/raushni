@@ -1,4 +1,3 @@
-# docker-compose.yml
 services:
   postgres:
     image: postgres:15
@@ -8,7 +7,7 @@ services:
       POSTGRES_USER: raushni_user
       POSTGRES_PASSWORD: raushni_password
     ports:
-      - "5432:5432"
+      - "5433:5432"  # Changed to avoid conflicts
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -26,7 +25,7 @@ services:
     build: ./backend
     container_name: raushni-backend
     ports:
-      - "5000:5000"
+      - "5001:5000"  # Changed from 5000 to 5001
     depends_on:
       - postgres
       - redis
@@ -52,7 +51,7 @@ services:
     depends_on:
       - backend
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:5000
+      NEXT_PUBLIC_API_URL: http://localhost:5001  # Updated to match
     networks:
       - raushni_network
 
