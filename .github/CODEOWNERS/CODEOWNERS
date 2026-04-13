@@ -1,0 +1,54 @@
+# Raushni Platform CODEOWNERS
+# Repository: https://github.com/owais4u/raushni
+# Last Updated: 2024-01-01
+
+# Default owners for the entire repository
+* @owais4u @raushni/core-team
+
+# Backend (Python/FastAPI)
+/backend/ @owais4u @raushni/backend-team
+/backend/app/api/ @owais4u @raushni/backend-team
+/backend/app/core/ @owais4u @raushni/security-team
+/backend/app/models/ @owais4u @raushni/database-team
+/backend/app/schemas/ @owais4u @raushni/backend-team
+/backend/app/services/ @owais4u @raushni/backend-team
+/backend/tests/ @owais4u @raushni/qa-team
+
+# Frontend (Next.js/React)
+/frontend/ @owais4u @raushni/frontend-team
+/frontend/app/ @owais4u @raushni/frontend-team
+/frontend/components/ @owais4u @raushni/ui-team
+/frontend/hooks/ @owais4u @raushni/frontend-team
+/frontend/services/ @owais4u @raushni/frontend-team
+/frontend/public/assets/ @owais4u @raushni/design-team
+
+# CMS (Strapi)
+/cms/ @owais4u @raushni/cms-team
+/cms/src/api/ @owais4u @raushni/cms-team
+/cms/config/ @owais4u @raushni/devops-team
+
+# Database
+/database/ @owais4u @raushni/database-team
+/database/migrations/ @owais4u @raushni/database-team
+
+# Infrastructure
+/infrastructure/ @owais4u @raushni/devops-team
+/docker-compose.yml @owais4u @raushni/devops-team
+/Dockerfile* @owais4u @raushni/devops-team
+
+# Security-critical files
+/backend/app/core/security.py @owais4u @raushni/security-team
+/frontend/middleware.ts @owais4u @raushni/security-team
+/.env* @owais4u @raushni/security-team
+
+# Documentation
+/docs/ @owais4u @raushni/docs-team
+/README.md @owais4u @raushni/docs-team
+
+# CI/CD
+/.github/workflows/ @owais4u @raushni/devops-team
+
+# Configuration files
+/*.config.js @owais4u @raushni/frontend-team
+/package*.json @owais4u @raushni/frontend-team
+/requirements*.txt @owais4u @raushni/backend-team
