@@ -1,0 +1,63 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: raushni-postgres
+    environment:
+      POSTGRES_DB: raushni
+      POSTGRES_USER: raushni_user
+      POSTGRES_PASSWORD: raushni_password
+    ports:
+      - "5433:5432"  # Changed to avoid conflicts
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - raushni_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: raushni-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - raushni_network
+
+  backend:
+    build: ./backend
+    container_name: raushni-backend
+    ports:
+      - "5001:5000"  # Changed from 5000 to 5001
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgresql://raushni_user:raushni_password@postgres:5432/raushni
+      PORT: 5000
+    networks:
+      - raushni_network
+
+  python-service:
+    build: ./services/document_generator
+    container_name: raushni-python-service
+    ports:
+      - "8000:8000"
+    networks:
+      - raushni_network
+
+  frontend:
+    build: ./frontend
+    container_name: raushni-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:5001  # Updated to match
+    networks:
+      - raushni_network
+
+volumes:
+  postgres_data:
+
+networks:
+  raushni_network:
+    driver: bridge
