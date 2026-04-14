@@ -1,0 +1,8 @@
+*.log
+*.sql.gz
+backups/*.sql.gz
+!backups/.gitkeep
+.env
+.git
+README.md
+.DS_Store

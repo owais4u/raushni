@@ -1,0 +1,21 @@
+# CMS Test Container
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install Strapi test dependencies
+COPY cms/package.json cms/package-lock.json ./
+RUN npm ci
+
+# Copy CMS code
+COPY cms/ .
+
+# Copy test files
+COPY tests/cms/ ./tests/
+
+# Set environment
+ENV NODE_ENV=test
+ENV STRAPI_DISABLE_UPDATE_NOTIFICATION=true
+
+# Run Strapi tests
+CMD ["npm", "run", "test"]

@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  # Test Database
+  test-db:
+    image: postgres:15-alpine
+    container_name: raushni-test-db
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_pass
+      POSTGRES_DB: raushni_test
+    ports:
+      - "5433:5432"
+    networks:
+      - test-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Test Redis
+  test-redis:
+    image: redis:7-alpine
+    container_name: raushni-test-redis
+    ports:
+      - "6380:6379"
+    networks:
+      - test-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Backend Tests
+  backend-tests:
+    build:
+      context: ../../
+      dockerfile: tests/docker/Dockerfile.test-backend
+    container_name: raushni-backend-tests
+    depends_on:
+      test-db:
+        condition: service_healthy
+      test-redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://test_user:test_pass@test-db:5432/raushni_test
+      REDIS_URL: redis://test-redis:6379
+    networks:
+      - test-network
+    volumes:
+      - ../../backend:/app
+      - ../../tests/backend:/app/tests
+      - test-reports:/app/reports
+
+  # Frontend Tests
+  frontend-tests:
+    build:
+      context: ../../
+      dockerfile: tests/docker/Dockerfile.test-frontend
+    container_name: raushni-frontend-tests
+    depends_on:
+      - backend-tests
+    networks:
+      - test-network
+    volumes:
+      - ../../frontend:/app
+      - ../../tests/frontend:/app/tests
+      - test-reports:/app/reports
+
+  # E2E Tests
+  e2e-tests:
+    build:
+      context: ../../
+      dockerfile: tests/docker/Dockerfile.test-e2e
+    container_name: raushni-e2e-tests
+    depends_on:
+      - frontend-tests
+    networks:
+      - test-network
+    volumes:
+      - ../../frontend:/app
+      - ../../tests/e2e:/app/cypress
+      - test-reports:/app/cypress/reports
+
+volumes:
+  test-reports:
+
+networks:
+  test-network:
+    driver: bridge

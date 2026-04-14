@@ -1,0 +1,22 @@
+FROM postgres:15-alpine
+
+# Install development tools
+RUN apk add --no-cache \
+    postgresql15-contrib \
+    postgis \
+    vim \
+    curl \
+    jq \
+    && rm -rf /var/cache/apk/*
+
+COPY postgresql.conf /etc/postgresql/postgresql.conf
+COPY init.sql /docker-entrypoint-initdb.d/
+COPY migrations/ /docker-entrypoint-initdb.d/migrations/
+COPY scripts/seed_data.sql /docker-entrypoint-initdb.d/seed.sql
+
+EXPOSE 5432
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD pg_isready -U postgres
+
+CMD ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]

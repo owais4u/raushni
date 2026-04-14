@@ -1,0 +1,18 @@
+# End-to-End Test Container (Cypress)
+FROM cypress/included:13.6.0
+
+WORKDIR /app
+
+# Copy frontend and test files
+COPY frontend/ .
+COPY tests/e2e/ ./cypress/
+
+# Copy custom Cypress configuration
+COPY tests/cypress.config.js .
+
+# Set environment
+ENV CYPRESS_BASE_URL=http://frontend:3000
+ENV CYPRESS_API_URL=http://backend:8000
+
+# Run Cypress tests
+CMD ["cypress", "run", "--browser", "chrome", "--headless"]

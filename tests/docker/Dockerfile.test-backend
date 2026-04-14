@@ -1,0 +1,34 @@
+# Backend Test Container
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    libpq-dev \
+    curl \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python test dependencies
+COPY backend/requirements.txt .
+COPY backend/requirements-test.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir -r requirements-test.txt
+
+# Copy backend code
+COPY backend/ .
+
+# Copy test files
+COPY tests/backend/ ./tests/
+
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV ENVIRONMENT=testing
+ENV DATABASE_URL=postgresql://test_user:test_pass@test-db:5432/raushni_test
+
+# Run tests
+CMD ["pytest", "tests/", "-v", "--cov=app", "--cov-report=term-missing", "--cov-report=html"]

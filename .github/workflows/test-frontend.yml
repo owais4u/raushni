@@ -1,0 +1,61 @@
+name: Frontend Tests
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'frontend/**'
+      - 'tests/frontend/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - 'tests/frontend/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Run linting
+        run: |
+          cd frontend
+          npm run lint
+
+      - name: Run type checking
+        run: |
+          cd frontend
+          npm run type-check
+
+      - name: Run unit tests
+        run: |
+          cd frontend
+          npm run test:ci
+        env:
+          CI: true
+
+      - name: Run build test
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          directory: frontend/coverage
+          flags: frontend
+          name: frontend-coverage

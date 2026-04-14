@@ -1,0 +1,21 @@
+# Frontend Test Container
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dependencies
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+
+# Copy frontend code
+COPY frontend/ .
+
+# Copy test files
+COPY tests/frontend/ ./tests/
+
+# Set environment
+ENV NODE_ENV=test
+ENV CI=true
+
+# Run tests
+CMD ["npm", "run", "test:ci"]

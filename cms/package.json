@@ -40,5 +40,14 @@
     "uuid": "raushni-cms",
     "name": "Raushni CMS",
     "description": "Content Management System for Raushni NGO"
+  },
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3"
   }
 }

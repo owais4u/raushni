@@ -1,0 +1,74 @@
+#!/bin/bash
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+echo -e "${GREEN}🚀 Running Raushni Test Suite${NC}\n"
+
+# Function to run backend tests
+run_backend_tests() {
+    echo -e "${YELLOW}📦 Running Backend Tests...${NC}"
+    cd backend
+    pytest tests/ -v --cov=app --cov-report=term --cov-report=html
+    cd ..
+    echo -e "${GREEN}✅ Backend Tests Complete${NC}\n"
+}
+
+# Function to run frontend tests
+run_frontend_tests() {
+    echo -e "${YELLOW}⚛️ Running Frontend Tests...${NC}"
+    cd frontend
+    npm run test:ci
+    cd ..
+    echo -e "${GREEN}✅ Frontend Tests Complete${NC}\n"
+}
+
+# Function to run E2E tests
+run_e2e_tests() {
+    echo -e "${YELLOW}🌐 Running E2E Tests...${NC}"
+
+    # Start services
+    docker-compose -f tests/docker/docker-compose.test.yml up -d
+
+    # Wait for services
+    sleep 10
+
+    # Run E2E tests
+    cd frontend
+    npm run test:e2e:ci
+    cd ..
+
+    # Stop services
+    docker-compose -f tests/docker/docker-compose.test.yml down
+
+    echo -e "${GREEN}✅ E2E Tests Complete${NC}\n"
+}
+
+# Parse arguments
+case "${1}" in
+    backend)
+        run_backend_tests
+        ;;
+    frontend)
+        run_frontend_tests
+        ;;
+    e2e)
+        run_e2e_tests
+        ;;
+    all)
+        run_backend_tests
+        run_frontend_tests
+        run_e2e_tests
+        ;;
+    *)
+        echo "Usage: $0 {backend|frontend|e2e|all}"
+        exit 1
+        ;;
+esac
+
+echo -e "${GREEN}🎉 All tests completed successfully!${NC}"
