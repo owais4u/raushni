@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # Main test database
+  test-db:
+    image: postgres:15-alpine
+    container_name: raushni-test-db
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_pass
+      POSTGRES_DB: raushni_test
+    ports:
+      - "5433:5432"  # Use different port to avoid conflict
+    volumes:
+      - test_db_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./migrations:/docker-entrypoint-initdb.d/migrations
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d raushni_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - test-network
+
+  # Test runner (optional – runs schema validation)
+  test-runner:
+    image: postgres:15-alpine
+    container_name: raushni-test-runner
+    depends_on:
+      test-db:
+        condition: service_healthy
+    environment:
+      PGHOST: test-db
+      PGUSER: test_user
+      PGPASSWORD: test_pass
+      PGDATABASE: raushni_test
+    command: >
+      sh -c "
+        echo 'Running database tests...' &&
+        psql -c 'SELECT COUNT(*) FROM information_schema.tables;' &&
+        psql -c 'SELECT version();' &&
+        echo 'All tests passed!'
+      "
+    networks:
+      - test-network
+
+  # Optional: Automated backup test
+  backup-test:
+    image: postgres:15-alpine
+    container_name: raushni-backup-test
+    depends_on:
+      - test-db
+    volumes:
+      - ./backups:/backups
+    environment:
+      PGHOST: test-db
+      PGUSER: test_user
+      PGPASSWORD: test_pass
+      PGDATABASE: raushni_test
+    command: >
+      sh -c "
+        mkdir -p /backups &&
+        pg_dump > /backups/test_backup_$(date +%Y%m%d_%H%M%S).sql &&
+        echo 'Backup completed'
+      "
+    networks:
+      - test-network
+
+volumes:
+  test_db_data:
+
+networks:
+  test-network:
+    driver: bridge

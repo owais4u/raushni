@@ -17,11 +17,11 @@ INSERT INTO members (id, member_id, name, email, phone, address, designation, jo
 VALUES (
     gen_random_uuid(),
     'RSN1001',
-    'John Doe',
-    'john@example.com',
+    'Owais Ahmad',
+    'raushni.eswt@gmail.com.com',
     '9876543210',
-    '123 Main St, New Delhi',
-    'Volunteer',
+    'Rauzah Appartment Ward# 14, Bhatauna Road, Marwan Khurd Muzaffarpur Bihar 843113',
+    'Chairman',
     CURRENT_DATE,
     'ACTIVE'
 ) ON CONFLICT (email) DO NOTHING;
