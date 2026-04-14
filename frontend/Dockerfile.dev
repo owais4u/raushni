@@ -1,0 +1,28 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install development tools
+RUN apk add --no-cache \
+    curl \
+    vim \
+    git
+
+# Copy package files
+COPY package.json package-lock.json* ./
+
+# Install all dependencies (including dev)
+RUN npm install
+
+# Copy application code
+COPY . .
+
+# Expose ports
+EXPOSE 3000
+
+# Set environment
+ENV NODE_ENV development
+ENV NEXT_TELEMETRY_DISABLED 1
+
+# Run in development mode
+CMD ["npm", "run", "dev"]

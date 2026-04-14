@@ -1,0 +1,39 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install development dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    libpq-dev \
+    curl \
+    vim \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python development tools
+RUN pip install --no-cache-dir \
+    poetry==1.7.1 \
+    ipython \
+    pytest \
+    black \
+    flake8
+
+# Copy dependency files
+COPY pyproject.toml poetry.lock* ./
+
+# Install all dependencies (including dev)
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-interaction
+
+# Copy application code
+COPY . .
+
+# Create necessary directories
+RUN mkdir -p /app/static/uploads /app/logs
+
+# Expose port
+EXPOSE 8000
+
+# Run in development mode with hot reload
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
