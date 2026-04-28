@@ -1,7 +1,7 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
-  roots: ['<rootDir>/tests'],
+  roots: ['<rootDir>'],
   modulePaths: ['<rootDir>'],
   moduleDirectories: ['node_modules', '<rootDir>'],
   moduleNameMapper: {
@@ -11,8 +11,14 @@ module.exports = {
   },
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   testMatch: [
-    '<rootDir>/tests/unit/**/*.test.{ts,tsx}',
-    '<rootDir>/tests/integration/**/*.test.{ts,tsx}',
+    '<rootDir>/**/?(*.)+(test|spec).{ts,tsx,js,jsx}',
+  ],
+  testPathIgnorePatterns: [
+    '<rootDir>/node_modules/',
+    '<rootDir>/.next/',
+    '<rootDir>/dist/',
+    '<rootDir>/build/',
+    '<rootDir>/cypress/',
   ],
   collectCoverageFrom: [
     'components/**/*.{ts,tsx}',
