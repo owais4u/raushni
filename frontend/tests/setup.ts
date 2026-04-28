@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 import { configure } from '@testing-library/react';
+import { afterAll, beforeAll, jest } from '@jest/globals';
 
 // Configure testing library
 configure({ testIdAttribute: 'data-testid' });
@@ -25,9 +26,9 @@ jest.mock('next/image', () => ({
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: jest.fn().mockImplementation(query => ({
+  value: jest.fn().mockImplementation((...args: unknown[]) => ({
     matches: false,
-    media: query,
+    media: String(args[0] ?? ''),
     onchange: null,
     addListener: jest.fn(),
     removeListener: jest.fn(),

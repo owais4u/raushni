@@ -1,3 +1,5 @@
-export default function SectionLayout({ children }: { children: React.ReactNode }) {
+import type { ReactNode } from "react";
+
+export default function SectionLayout({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }

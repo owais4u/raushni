@@ -1,1 +1,16 @@
-{}
+{
+  "extends": ["next/core-web-vitals"],
+  "rules": {
+    "no-undef": "off",
+    "no-unused-vars": "off",
+    "react/no-unescaped-entities": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.test.{js,jsx,ts,tsx}", "tests/**/*.{js,jsx,ts,tsx}"],
+      "env": {
+        "jest": true
+      }
+    }
+  ]
+}
