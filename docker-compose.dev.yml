@@ -1,0 +1,16 @@
+services:
+  backend:
+    environment:
+      ENVIRONMENT: development
+      DEBUG: "true"
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_CMS_URL: http://localhost:1337
+
+  strapi:
+    environment:
+      NODE_ENV: development
