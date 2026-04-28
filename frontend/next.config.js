@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextPwa = require('next-pwa');
-const withPWA = (nextPwa.default || nextPwa)({
+const pwaPlugin = (nextPwa.default || nextPwa)({
   dest: 'public',
   register: true,
   skipWaiting: true,
@@ -8,11 +8,15 @@ const withPWA = (nextPwa.default || nextPwa)({
 
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   output: 'standalone',
+  turbopack: {},
 
   images: {
-    domains: ['localhost', 'api.raushni.com', 'cms.raushni.com'],
+    remotePatterns: [
+      { protocol: 'http', hostname: 'localhost' },
+      { protocol: 'https', hostname: 'api.raushni.com' },
+      { protocol: 'https', hostname: 'cms.raushni.com' },
+    ],
     formats: ['image/avif', 'image/webp'],
   },
 
@@ -38,18 +42,9 @@ const nextConfig = {
       {
         source: '/(.*)',
         headers: [
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
-          },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-XSS-Protection', value: '1; mode=block' },
         ],
       },
     ];
@@ -62,9 +57,9 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', 'react-icons', 'date-fns'],
   },
+
+  // next-pwa v2 injects a webpack hook; keep only the supported key.
+  webpack: pwaPlugin.webpack,
 };
 
-module.exports = {
-  ...nextConfig,
-  ...withPWA,
-};
+module.exports = nextConfig;

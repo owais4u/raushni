@@ -2,14 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { Menu, X, ChevronDown, Bell, User, LogOut, Settings } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Header({ sidebarOpen, setSidebarOpen }) {
   const [scrolled, setScrolled] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,17 +25,21 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-lg hover:bg-gray-100 lg:hidden transition-colors"
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
           >
             {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
 
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">R</span>
-            </div>
+            <img
+              src="/assets/images/logo.png"
+              alt="Raushni logo"
+              className="rounded-full object-cover"
+              style={{ width: "1in", height: "1in" }}
+            />
             <span className="font-bold text-xl hidden sm:inline bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent">
-              Raushni
+              RAUSHNI-ESWT
             </span>
           </Link>
         </div>
@@ -78,14 +79,8 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
               <ChevronDown size={16} className="hidden md:block" />
             </button>
 
-            <AnimatePresence>
-              {userMenuOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50"
-                >
+            {userMenuOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50">
                   <Link href="/profile" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                     <User size={16} /> Profile
                   </Link>
@@ -96,9 +91,8 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
                   <button className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-gray-50 w-full">
                     <LogOut size={16} /> Logout
                   </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -39,10 +39,13 @@ export default function Footer() {
           {/* About Section */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">R</span>
-              </div>
-              <h3 className="text-lg font-semibold text-white">Raushni Trust</h3>
+              <img
+                src="/assets/images/logo.png"
+                alt="Raushni logo"
+                className="rounded-full object-cover"
+                style={{ width: "1in", height: "1in" }}
+              />
+              <h3 className="text-lg font-semibold text-white">Raushni-ESWT</h3>
             </div>
             <p className="text-sm leading-relaxed">
               Empowering communities through education and social welfare.

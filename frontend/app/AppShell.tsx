@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import Header from "@/components/Layout/Header";
 import Sidebar from "@/components/Layout/Sidebar";
@@ -13,14 +13,31 @@ export default function AppShell({
 }>) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  useEffect(() => {
+    const syncDesktopState = () => {
+      setSidebarOpen(window.innerWidth >= 1024);
+    };
+    syncDesktopState();
+    window.addEventListener("resize", syncDesktopState);
+    return () => window.removeEventListener("resize", syncDesktopState);
+  }, []);
+
   return (
     <div className="min-h-screen">
       <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-      <main className="mt-16 transition-all duration-300 lg:ml-72">{children}</main>
+      <main
+        className={`mt-28 transition-all duration-300 ${
+          sidebarOpen ? "lg:ml-72" : "lg:ml-0"
+        }`}
+      >
+        {children}
+      </main>
 
-      <Footer />
+      <div className={`transition-all duration-300 ${sidebarOpen ? "lg:ml-72" : "lg:ml-0"}`}>
+        <Footer />
+      </div>
     </div>
   );
 }

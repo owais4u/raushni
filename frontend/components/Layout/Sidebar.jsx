@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
   Users,
@@ -37,7 +36,7 @@ const menuItems = [
   { category: "Management", items: [
     { name: "Donation Management", href: "/donations", icon: Heart },
     { name: "Activity Posts", href: "/activities", icon: Activity },
-    { name: "Event Management", href: "/events", icon: Calendar },
+    { name: "Event Management", href: "/dashboard/events", icon: Calendar },
     { name: "Designation Management", href: "/designations", icon: UserPlus },
     { name: "Enquiry Management", href: "/enquiries", icon: Mail },
     { name: "News Management", href: "/news", icon: Newspaper },
@@ -67,44 +66,40 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
   return (
     <>
       {/* Mobile overlay */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSidebarOpen(false)}
-            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          />
-        )}
-      </AnimatePresence>
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+        />
+      )}
 
       {/* Sidebar */}
-      <motion.aside
-        initial={{ x: -280 }}
-        animate={{ x: sidebarOpen ? 0 : -280 }}
-        transition={{ type: "tween", duration: 0.3 }}
-        className={`fixed top-0 left-0 h-full w-72 bg-white border-r border-gray-200 z-50 overflow-y-auto shadow-xl lg:shadow-none ${
-          sidebarOpen ? 'block' : 'hidden lg:block lg:translate-x-0'
-        }`}
+      <aside
+        className={`fixed top-28 left-0 h-[calc(100vh-7rem)] w-72 bg-white border-r border-gray-200 z-40 overflow-y-auto shadow-xl transition-transform duration-300 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:shadow-none`}
       >
         <div className="p-6">
           {/* Logo */}
           <div className="flex items-center justify-between mb-8">
             <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-xl">R</span>
-              </div>
+              <img
+                src="/assets/images/logo.png"
+                alt="Raushni logo"
+                className="rounded-full object-cover"
+                style={{ width: "1in", height: "1in" }}
+              />
               <div>
                 <h1 className="font-bold text-xl bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent">
-                  Raushni
+                  NGO
                 </h1>
-                <p className="text-xs text-gray-500">NGO Management</p>
+                <p className="text-xs text-gray-500">Management</p>
               </div>
             </Link>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="p-2 rounded-lg hover:bg-gray-100 lg:hidden"
+              className="p-2 rounded-lg hover:bg-gray-100"
+              aria-label="Close sidebar"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -135,12 +130,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                       >
                         <Icon size={18} className={active ? 'text-white' : 'text-gray-400 group-hover:text-orange-500'} />
                         <span className="text-sm font-medium">{item.name}</span>
-                        {active && (
-                          <motion.div
-                            layoutId="active-indicator"
-                            className="ml-auto w-1 h-1 bg-white rounded-full"
-                          />
-                        )}
+                        {active && <span className="ml-auto w-1 h-1 bg-white rounded-full" />}
                       </Link>
                     );
                   })}
@@ -157,7 +147,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             </button>
           </div>
         </div>
-      </motion.aside>
+      </aside>
     </>
   );
 }
