@@ -34,16 +34,17 @@ services:
       PGHOST: test-db
       PGUSER: test_user
       PGPASSWORD: test_pass
-      PGDATABASE: raushni_test
+      PGDATABASE: postgres
     command: >
       sh -c "
-        echo 'Running database tests...' &&
-        psql -c 'SELECT COUNT(*) FROM information_schema.tables;' &&
-        psql -c 'SELECT version();' &&
-        echo 'All tests passed!'
+        apk add --no-cache bash &&
+        chmod +x /app/tests/run_tests.sh &&
+        /app/tests/run_tests.sh
       "
     networks:
       - test-network
+    volumes:
+      - ./:/app
 
   # Optional: Automated backup test
   backup-test:

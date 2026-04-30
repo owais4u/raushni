@@ -77,3 +77,40 @@ docker exec -it raushni-postgres pg_isready
 
 # Access psql
 docker exec -it raushni-postgres psql -U postgres
+---
+
+## ✅ Database Tests
+
+### Test Cases Implemented
+
+- **Schema Tests** (`database/tests/test_schema.sql`)
+  - Required tables exist: `users`, `members`, `designations`, `activities`, `enquiries`, `news`, `projects`, `donations`
+  - Required columns exist on `members`
+  - Required indexes exist
+  - `dashboard_stats` view exists
+
+- **Data Tests** (`database/tests/test_data.sql`)
+  - Seeded admin user exists (`admin@raushni.com`)
+  - Seeded sample member exists (`RSN1001`)
+
+### Local Execution
+
+```bash
+cd database
+docker compose -f docker-compose.test.yml up --abort-on-container-exit --build
+```
+
+### Manual Execution (against running DB)
+
+```bash
+cd database
+PGHOST=localhost PGPORT=5432 PGUSER=postgres PGPASSWORD=postgres PGDATABASE=postgres ./tests/run_tests.sh
+```
+
+### Expected Result
+
+- Exit code `0`
+- Output includes:
+  - `[db-test] running schema tests`
+  - `[db-test] running data tests`
+  - `[db-test] all tests passed`

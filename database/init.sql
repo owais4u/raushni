@@ -31,22 +31,39 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA strapi GRANT ALL ON TABLES TO strapi_user;
 CREATE USER backup_user WITH PASSWORD 'backup_password';
 GRANT CONNECT ON DATABASE raushni_backend TO backup_user;
 GRANT CONNECT ON DATABASE raushni_cms TO backup_user;
-GRANT SELECT ON ALL TABLES IN SCHEMA raushni TO backup_user;
-GRANT SELECT ON ALL TABLES IN SCHEMA strapi TO backup_user;
 
--- Enable pg_stat_statements for monitoring
+-- Enable monitoring extension
 CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 
--- Create indexes for performance
-\c raushni_backend
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_member_email ON members(email);
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_donation_date ON donations(created_at);
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_project_status ON projects(status);
+-- Optional performance indexes (create only when target tables exist)
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='members') THEN
+    CREATE INDEX IF NOT EXISTS idx_member_email ON members(email);
+  END IF;
 
--- Create view for dashboard statistics
-CREATE OR REPLACE VIEW dashboard_stats AS
-SELECT
-    (SELECT COUNT(*) FROM members WHERE is_active = true) as total_members,
-    (SELECT COUNT(*) FROM donations WHERE status = 'COMPLETED') as total_donations,
-    (SELECT COALESCE(SUM(amount), 0) FROM donations WHERE status = 'COMPLETED') as total_amount,
-    (SELECT COUNT(*) FROM projects WHERE status = 'ACTIVE') as active_projects;
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='donations') THEN
+    CREATE INDEX IF NOT EXISTS idx_donation_date ON donations(created_at);
+  END IF;
+
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='projects') THEN
+    CREATE INDEX IF NOT EXISTS idx_project_status ON projects(status);
+  END IF;
+END $$;
+
+-- Optional dashboard view (create only when dependencies exist)
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='members')
+     AND EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='donations')
+     AND EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='projects') THEN
+    EXECUTE '
+      CREATE OR REPLACE VIEW dashboard_stats AS
+      SELECT
+        (SELECT COUNT(*) FROM members WHERE status = ''ACTIVE'') AS total_members,
+        (SELECT COUNT(*) FROM donations WHERE status = ''COMPLETED'') AS total_donations,
+        (SELECT COALESCE(SUM(amount), 0) FROM donations WHERE status = ''COMPLETED'') AS total_amount,
+        (SELECT COUNT(*) FROM projects WHERE status = ''ACTIVE'') AS active_projects
+    ';
+  END IF;
+END $$;
