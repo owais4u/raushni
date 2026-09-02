@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Mail, Phone, MapPin, Send, ArrowRight } from "lucide-react";
+import LanguageToggle from "@/components/Common/LanguageToggle";
 import type { PublicLink } from "@/lib/cms/publicContentShared";
+import { translateNavLabel } from "@/lib/i18n";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 
 type FooterLink = PublicLink & { name?: string };
 
@@ -183,7 +186,8 @@ const socialLinks: Array<{ name: string; href: string; icon: ReactNode }> = [
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
-  const [content, setContent] = useState<FooterContent>(defaultFooterContent);
+  const { locale, messages } = useLocale();
+  const [cmsContent, setCmsContent] = useState<FooterContent | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -202,7 +206,7 @@ export default function Footer() {
         const settings = firstAttributes(settingResponse);
 
         if (attributes || settings) {
-          setContent({
+          setCmsContent({
             title: settings?.siteName ?? attributes?.title ?? defaultFooterContent.title,
             description: settings?.description ?? attributes?.heroSubtitle ?? defaultFooterContent.description,
             contactAddress: settings?.contactAddress ?? attributes?.contactAddress ?? defaultFooterContent.contactAddress,
@@ -227,6 +231,21 @@ export default function Footer() {
     return () => controller.abort();
   }, []);
 
+  const content = useMemo(() => {
+    const base = cmsContent ?? defaultFooterContent;
+    // CMS is English-only today; use locale catalog for chrome copy when Hindi is active.
+    if (locale === "hi") {
+      return {
+        ...base,
+        description: messages.footer.description,
+        newsletterTitle: messages.footer.newsletterTitle,
+        newsletterText: messages.footer.newsletterText,
+        footerNote: messages.footer.footerNote,
+      };
+    }
+    return base;
+  }, [cmsContent, locale, messages.footer]);
+
   return (
     <footer className="public-footer border-t border-stone-200 bg-white text-stone-950">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -242,7 +261,7 @@ export default function Footer() {
 
             <p className={`mt-5 max-w-sm ${footerStyles.muted}`}>{content.description}</p>
 
-            <div className="mt-5 flex gap-3">
+            <div className="mt-5 flex flex-wrap items-center gap-3">
               {socialLinks.map((social) => (
                 <a
                   key={social.name}
@@ -255,16 +274,17 @@ export default function Footer() {
                   {social.icon}
                 </a>
               ))}
+              <LanguageToggle variant="footer" />
             </div>
           </div>
 
           <div>
-            <h3 className={footerStyles.heading}>Explore</h3>
+            <h3 className={footerStyles.heading}>{messages.common.explore}</h3>
             <ul className="mt-5 space-y-3">
               {content.quickLinks.map((link) => (
                 <li key={linkKey(link)}>
                   <Link href={link.href} className={footerStyles.link}>
-                    {linkLabel(link)}
+                    {translateNavLabel(locale, link.href, linkLabel(link))}
                   </Link>
                 </li>
               ))}
@@ -272,12 +292,12 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className={footerStyles.heading}>Links</h3>
+            <h3 className={footerStyles.heading}>{messages.common.links}</h3>
             <ul className="mt-5 space-y-3">
               {content.supportLinks.map((link) => (
                 <li key={linkKey(link)}>
                   <Link href={link.href} className={footerStyles.link}>
-                    {linkLabel(link)}
+                    {translateNavLabel(locale, link.href, linkLabel(link))}
                   </Link>
                 </li>
               ))}
@@ -285,7 +305,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className={footerStyles.heading}>Contact</h3>
+            <h3 className={footerStyles.heading}>{messages.common.contact}</h3>
             <div className="mt-5 space-y-4">
               <div className="flex items-start gap-3">
                 <MapPin size={20} className="public-footer-accent mt-0.5 flex-none text-amber-700" />
@@ -314,10 +334,14 @@ export default function Footer() {
               <p className={`mt-1 ${footerStyles.note}`}>{content.newsletterText}</p>
             </div>
             <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
-              <input type="email" placeholder="Enter your email" className={footerStyles.input} />
+              <input
+                type="email"
+                placeholder={messages.common.emailPlaceholder}
+                className={footerStyles.input}
+              />
               <button type="button" className={footerStyles.primaryButton}>
                 <Send size={16} aria-hidden="true" />
-                Subscribe
+                {messages.common.subscribe}
               </button>
             </div>
           </div>
@@ -326,7 +350,9 @@ export default function Footer() {
         <div
           className={`public-footer-divider mt-8 flex flex-col gap-3 border-t border-stone-200 pt-8 md:flex-row md:items-center md:justify-between ${footerStyles.note}`}
         >
-          <p>© {currentYear}. All rights reserved.</p>
+          <p>
+            © {currentYear}. {messages.common.allRightsReserved}
+          </p>
           <p className="inline-flex items-center gap-2 text-xs">
             {content.footerNote}
             <ArrowRight size={14} aria-hidden="true" />

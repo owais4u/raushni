@@ -5,11 +5,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LogOut } from 'lucide-react';
 import { signOut } from 'next-auth/react';
+import LanguageToggle from '@/components/Common/LanguageToggle';
 import { DASHBOARD_MODULES } from '@/lib/auth/modules';
 import { canAdmin, getStoredUser, isReadOnly, signOutToGuest } from '@/lib/auth/permissions';
+import { useLocale } from '@/lib/i18n/LocaleProvider';
 
 export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const pathname = usePathname();
+  const { messages } = useLocale();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -35,9 +38,14 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
     return item.access !== 'admin' || canAdmin(user.role);
   };
 
+  const translateCategory = (category) =>
+    messages.dashboard.categories[category] ?? category;
+
+  const translateModule = (name) =>
+    messages.dashboard.modules[name] ?? name;
+
   return (
     <>
-      {/* Mobile overlay */}
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
@@ -45,33 +53,21 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={`fixed top-16 right-0 h-[calc(100vh-4rem)] w-72 bg-white border-l border-stone-200 z-40 overflow-y-auto shadow-xl transition-transform duration-300 ${
           sidebarOpen ? 'translate-x-0' : 'translate-x-full'
         } lg:shadow-none`}
       >
         <div className="p-6">
-          {/* Logo and User Avatar */}
           <div className="flex items-center justify-between mb-8">
             <Link href="/dashboard" className="flex items-center gap-3">
-              {/* Logo Image 
-               
-              <img
-                src="/assets/images/o4uL2.png"
-                alt="Raushni logo"
-                className="rounded-full object-cover"
-                style={{ width: "50px", height: "50px" }}
-              />
-              */}
-              {/* Dynamic User Profile Image */}
               <div className="relative">
                 {loading ? (
                   <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse"></div>
                 ) : user?.profileImage ? (
                   <img
                     src={user.profileImage}
-                    alt={user.name || "Profile"}
+                    alt={user.name || messages.common.guestUser}
                     className="w-10 h-10 rounded-full object-cover border-2 border-accent"
                   />
                 ) : (
@@ -83,15 +79,14 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                     )}
                   </div>
                 )}
-                {/* Online status indicator */}
                 <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
               </div>
             </Link>
-            
+
             <button
               onClick={() => setSidebarOpen(false)}
               className="p-2 rounded-lg hover:bg-gray-100 lg:hidden"
-              aria-label="Close sidebar"
+              aria-label={messages.common.closeSidebar}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -99,14 +94,13 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             </button>
           </div>
 
-          {/* User Info Section (Optional) */}
           {!loading && user && (
             <div className="mb-6 p-3 bg-amber-50 rounded-xl border border-amber-100">
               <div className="flex items-center gap-3">
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-gray-800">{user.name || 'Guest User'}</p>
+                  <p className="text-sm font-semibold text-gray-800">{user.name || messages.common.guestUser}</p>
                   <p className="text-xs text-gray-500 capitalize">
-                    {isReadOnly(user.role) ? 'Guest - read only' : user.role || 'Guest'}
+                    {isReadOnly(user.role) ? messages.common.guestReadOnly : user.role || 'Guest'}
                   </p>
                   <p className="mt-0.5 break-all text-xs text-gray-400">{user.email || 'guest@raushni.com'}</p>
                 </div>
@@ -114,7 +108,10 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             </div>
           )}
 
-          {/* Navigation */}
+          <div className="mb-6">
+            <LanguageToggle variant="footer" className="w-full justify-center" />
+          </div>
+
           <nav className="space-y-6">
             {DASHBOARD_MODULES.map((category, idx) => {
               const visibleItems = category.items.filter(canSeeModule);
@@ -123,7 +120,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
               return (
               <div key={idx}>
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                  {category.category}
+                  {translateCategory(category.category)}
                 </p>
                 <div className="space-y-1">
                   {visibleItems.map((item) => {
@@ -141,12 +138,14 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                         }`}
                       >
                         <Icon size={18} className={`mt-0.5 shrink-0 ${active ? 'text-accent' : 'text-stone-400 group-hover:text-amber-600'}`} />
-                        <span className="min-w-0 flex-1 whitespace-normal break-words text-sm font-medium leading-tight">{item.name}</span>
+                        <span className="min-w-0 flex-1 whitespace-normal break-words text-sm font-medium leading-tight">
+                          {translateModule(item.name)}
+                        </span>
                         {item.access === 'admin' && (
                           <span className={`ml-auto shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${
                             active ? 'bg-white/15 text-accent' : 'bg-amber-50 text-amber-800'
                           }`}>
-                            Admin
+                            {messages.common.admin}
                           </span>
                         )}
                         {active && <span className="ml-auto mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />}
@@ -159,9 +158,8 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             })}
           </nav>
 
-          {/* Logout button */}
           <div className="mt-8 pt-6 border-t border-gray-200">
-            <button 
+            <button
               onClick={() => {
                 signOutToGuest();
                 void signOut({ callbackUrl: '/login' });
@@ -169,7 +167,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
               className="flex items-center gap-3 px-3 py-2 w-full rounded-lg text-red-600 hover:bg-red-50 transition-colors group"
             >
               <LogOut size={18} className="group-hover:rotate-12 transition-transform" />
-              <span className="text-sm font-medium">Logout</span>
+              <span className="text-sm font-medium">{messages.common.logout}</span>
             </button>
           </div>
         </div>

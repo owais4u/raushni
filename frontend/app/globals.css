@@ -25,6 +25,11 @@ body {
   @apply bg-surface text-stone-900 antialiased;
 }
 
+/* Prefer Devanagari glyph coverage when Hindi is active */
+html[data-locale="hi"] body {
+  font-family: var(--font-devanagari), var(--font-sans), system-ui, sans-serif;
+}
+
 a {
   color: inherit;
   text-decoration: none;

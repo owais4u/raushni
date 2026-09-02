@@ -4,11 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { HeartHandshake, Menu, Moon, Sun, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import LanguageToggle from "@/components/Common/LanguageToggle";
 import {
   defaultSiteSettings,
   type CmsSiteSettings,
   type PublicLink,
 } from "@/lib/cms/publicContentShared";
+import { translateNavLabel } from "@/lib/i18n";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 
 type PublicTheme = "light" | "dark";
 
@@ -58,11 +61,13 @@ function NavLinks({
   pathname,
   className,
   linkClassName,
+  locale,
 }: {
   items: PublicLink[];
   pathname: string | null;
   className: string;
   linkClassName: (active: boolean) => string;
+  locale: "en" | "hi";
 }) {
   return (
     <nav className={className} aria-label="Primary">
@@ -70,7 +75,7 @@ function NavLinks({
         const active = pathname === item.href || (item.href === "/news" && Boolean(pathname?.startsWith("/blog")));
         return (
           <Link key={item.href} href={item.href} className={linkClassName(active)}>
-            {item.label}
+            {translateNavLabel(locale, item.href, item.label)}
           </Link>
         );
       })}
@@ -80,6 +85,7 @@ function NavLinks({
 
 export default function PublicHeader() {
   const pathname = usePathname();
+  const { locale, messages } = useLocale();
   const [open, setOpen] = useState(false);
   const [settings, setSettings] = useState<CmsSiteSettings>(defaultSiteSettings);
   const [theme, setTheme] = useState<PublicTheme>("light");
@@ -156,6 +162,7 @@ export default function PublicHeader() {
             pathname={pathname}
             className="hidden min-w-0 max-w-[28rem] items-center gap-0.5 overflow-x-auto lg:flex xl:max-w-none"
             linkClassName={desktopLinkClass}
+            locale={locale}
           />
 
           <Link
@@ -163,8 +170,10 @@ export default function PublicHeader() {
             className="hidden h-9 shrink-0 items-center justify-center gap-1.5 rounded-full bg-amber-400 px-3.5 text-xs font-bold text-stone-950 shadow-sm shadow-amber-900/10 transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:ring-offset-2 focus:ring-offset-[#120f0b] md:inline-flex"
           >
             <HeartHandshake size={14} aria-hidden="true" />
-            Donate
+            {messages.common.donate}
           </Link>
+
+          <LanguageToggle variant="public" className="hidden sm:inline-flex" />
 
           <button
             type="button"
@@ -174,18 +183,18 @@ export default function PublicHeader() {
                 ? "border-amber-200 bg-white text-stone-950 hover:bg-amber-50"
                 : "border-amber-300 bg-amber-400 text-stone-950 hover:bg-amber-300"
             }`}
-            aria-label={theme === "dark" ? "Switch public pages to light mode" : "Switch public pages to dark mode"}
+            aria-label={theme === "dark" ? messages.theme.toLight : messages.theme.toDark}
             aria-pressed={theme === "dark"}
           >
             {theme === "dark" ? <Sun size={14} aria-hidden="true" /> : <Moon size={14} aria-hidden="true" />}
-            {theme === "dark" ? "Light" : "Dark"}
+            {theme === "dark" ? messages.common.light : messages.common.dark}
           </button>
 
           <button
             type="button"
             onClick={() => setOpen((value) => !value)}
             className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white transition hover:bg-white/10 lg:hidden"
-            aria-label="Toggle navigation"
+            aria-label={messages.common.toggleNav}
             aria-expanded={open}
           >
             {open ? <X size={18} aria-hidden="true" /> : <Menu size={18} aria-hidden="true" />}
@@ -203,7 +212,7 @@ export default function PublicHeader() {
                 onClick={() => setOpen(false)}
                 className="rounded-lg px-3 py-2.5 text-sm font-semibold leading-tight text-white/75 transition hover:bg-white/10 hover:text-amber-100"
               >
-                {item.label}
+                {translateNavLabel(locale, item.href, item.label)}
               </Link>
             ))}
             <Link
@@ -212,8 +221,9 @@ export default function PublicHeader() {
               className="mt-1 inline-flex min-h-10 items-center justify-center gap-2 rounded-full bg-amber-400 px-4 text-sm font-bold text-stone-950 transition hover:bg-amber-300"
             >
               <HeartHandshake size={16} aria-hidden="true" />
-              Donate
+              {messages.common.donate}
             </Link>
+            <LanguageToggle variant="public" className="min-h-10 w-full rounded-full" />
             <button
               type="button"
               onClick={toggleTheme}
@@ -222,11 +232,11 @@ export default function PublicHeader() {
                   ? "border-amber-200 bg-white text-stone-950 hover:bg-amber-50"
                   : "border-amber-300 bg-amber-400 text-stone-950 hover:bg-amber-300"
               }`}
-              aria-label={theme === "dark" ? "Switch public pages to light mode" : "Switch public pages to dark mode"}
+              aria-label={theme === "dark" ? messages.theme.toLight : messages.theme.toDark}
               aria-pressed={theme === "dark"}
             >
               {theme === "dark" ? <Sun size={16} aria-hidden="true" /> : <Moon size={16} aria-hidden="true" />}
-              {theme === "dark" ? "Light mode" : "Dark mode"}
+              {theme === "dark" ? messages.common.lightMode : messages.common.darkMode}
             </button>
           </div>
         </nav>

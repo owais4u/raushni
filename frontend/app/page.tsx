@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   BookOpen,
@@ -14,6 +14,7 @@ import {
   Sprout,
 } from "lucide-react";
 import PublicPageShell from "@/components/Public/PublicPageShell";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 
 const objectives = [
   "Formal and digital education for children and adults",
@@ -254,7 +255,8 @@ function normalizeLandingContent(attributes: StrapiLandingAttributes): LandingCo
 }
 
 export default function HomePage() {
-  const [landingContent, setLandingContent] = useState(defaultLandingContent);
+  const { locale, messages } = useLocale();
+  const [cmsLanding, setCmsLanding] = useState(defaultLandingContent);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -275,7 +277,7 @@ export default function HomePage() {
           : payload?.data?.attributes;
 
         if (attributes) {
-          setLandingContent(normalizeLandingContent(attributes));
+          setCmsLanding(normalizeLandingContent(attributes));
         }
       } catch (error) {
         if (!controller.signal.aborted) {
@@ -288,6 +290,31 @@ export default function HomePage() {
 
     return () => controller.abort();
   }, []);
+
+  const landingContent = useMemo(() => {
+    if (locale !== "hi") return cmsLanding;
+    const home = messages.home;
+    return {
+      ...cmsLanding,
+      heroEyebrow: home.heroEyebrow,
+      heroSubtitle: home.heroSubtitle,
+      aboutHeading: home.aboutHeading,
+      vision: home.vision,
+      missionHeading: home.missionHeading,
+      mission: home.mission,
+      successHeading: home.successHeading,
+      successIntro: home.successIntro,
+      volunteerHeading: home.volunteerHeading,
+      volunteerIntro: home.volunteerIntro,
+      contactHeading: home.contactHeading,
+      objectives: home.objectives,
+      volunteerWays: home.volunteerWays,
+      focusAreas: home.focusAreas.map((area, index) => ({
+        ...area,
+        icon: cmsLanding.focusAreas[index]?.icon ?? BookOpen,
+      })),
+    };
+  }, [cmsLanding, locale, messages.home]);
 
   return (
     <PublicPageShell mainClassName="bg-white text-stone-950">
@@ -320,14 +347,14 @@ export default function HomePage() {
                 href="#mission"
                 className={styles.primaryButton}
               >
-                Explore Our Work
+                {messages.home.exploreWork}
                 <ArrowRight size={18} aria-hidden="true" />
               </a>
               <a
                 href="#contact"
                 className={styles.secondaryButton}
               >
-                Contact the Trust
+                {messages.home.contactTrust}
               </a>
             </div>
           </div>
@@ -345,7 +372,7 @@ export default function HomePage() {
       <section id="about" className={styles.section}>
         <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
           <div>
-            <p className={styles.eyebrow}>About Us</p>
+            <p className={styles.eyebrow}>{messages.home.aboutEyebrow}</p>
             <h2 className={styles.heading}>
               {landingContent.aboutHeading}
             </h2>
@@ -359,7 +386,7 @@ export default function HomePage() {
       <section id="mission" className={styles.section}>
         <div className={styles.sectionInner}>
           <div className="max-w-3xl">
-            <p className={styles.eyebrow}>Our Mission</p>
+            <p className={styles.eyebrow}>{messages.home.missionEyebrow}</p>
             <h2 className={styles.heading}>
               {landingContent.missionHeading}
             </h2>
@@ -404,7 +431,7 @@ export default function HomePage() {
         <div className={styles.sectionInner}>
           <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
             <div>
-              <p className={styles.eyebrow}>Success Stories</p>
+              <p className={styles.eyebrow}>{messages.home.successEyebrow}</p>
               <h2 className={styles.heading}>
                 {landingContent.successHeading}
               </h2>
@@ -428,7 +455,7 @@ export default function HomePage() {
       <section id="volunteer" className={styles.section}>
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center">
           <div>
-            <p className={styles.eyebrow}>Volunteer</p>
+            <p className={styles.eyebrow}>{messages.home.volunteerEyebrow}</p>
             <h2 className={styles.heading}>
               {landingContent.volunteerHeading}
             </h2>
@@ -437,7 +464,7 @@ export default function HomePage() {
             </p>
           </div>
           <div className={styles.card}>
-            <h3 className="text-2xl font-black text-stone-950">Ways to help</h3>
+            <h3 className="text-2xl font-black text-stone-950">{messages.home.waysToHelp}</h3>
             <div className="mt-5 grid gap-3">
               {landingContent.volunteerWays.map((item) => (
                 <div key={item} className="flex items-center gap-3 text-sm font-semibold text-stone-800">
@@ -450,7 +477,7 @@ export default function HomePage() {
               href="#contact"
               className={`${styles.primaryButton} mt-7 min-h-11 px-5`}
             >
-              Start Volunteering
+              {messages.home.startVolunteering}
               <ArrowRight size={18} aria-hidden="true" />
             </a>
           </div>
@@ -460,7 +487,7 @@ export default function HomePage() {
       <section id="contact" className="scroll-mt-24 bg-white px-4 py-24 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
-            <p className={styles.eyebrow}>Contact</p>
+            <p className={styles.eyebrow}>{messages.home.contactEyebrow}</p>
             <h2 className={styles.heading}>
               {landingContent.contactHeading}
             </h2>
@@ -483,23 +510,23 @@ export default function HomePage() {
           <form className="rounded-lg border border-stone-200 bg-white p-6 shadow-sm">
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block">
-                <span className="text-sm font-bold text-stone-800">Name</span>
+                <span className="text-sm font-bold text-stone-800">{messages.home.name}</span>
                 <input className="mt-2 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 text-stone-950 placeholder:text-stone-500 outline-none transition focus:border-amber-600 focus:ring-2 focus:ring-amber-200" />
               </label>
               <label className="block">
-                <span className="text-sm font-bold text-stone-800">Phone or email</span>
+                <span className="text-sm font-bold text-stone-800">{messages.home.phoneOrEmail}</span>
                 <input className="mt-2 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 text-stone-950 placeholder:text-stone-500 outline-none transition focus:border-amber-600 focus:ring-2 focus:ring-amber-200" />
               </label>
             </div>
             <label className="mt-4 block">
-              <span className="text-sm font-bold text-stone-800">Message</span>
+              <span className="text-sm font-bold text-stone-800">{messages.home.message}</span>
               <textarea className="mt-2 min-h-32 w-full rounded-lg border border-stone-300 bg-white px-3 py-3 text-stone-950 placeholder:text-stone-500 outline-none transition focus:border-amber-600 focus:ring-2 focus:ring-amber-200" />
             </label>
             <button
               type="button"
               className={`${styles.primaryButton} mt-5 min-h-11 px-6`}
             >
-              Send Message
+              {messages.home.sendMessage}
             </button>
           </form>
         </div>

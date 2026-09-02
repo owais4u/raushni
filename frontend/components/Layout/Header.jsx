@@ -4,9 +4,12 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, X, ChevronDown, Bell, User, LogOut, Settings, Search } from 'lucide-react';
 import { signOut } from 'next-auth/react';
+import LanguageToggle from '@/components/Common/LanguageToggle';
 import { getStoredUser, isReadOnly, signOutToGuest } from '@/lib/auth/permissions';
+import { useLocale } from '@/lib/i18n/LocaleProvider';
 
 export default function Header({ sidebarOpen, setSidebarOpen }) {
+  const { messages } = useLocale();
   const [scrolled, setScrolled] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
@@ -28,7 +31,7 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
   }, []);
 
   const displayUser = user ?? {
-    name: 'Guest User',
+    name: messages.common.guestUser,
     email: 'guest@raushni.com',
     role: 'GUEST',
   };
@@ -53,7 +56,7 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
                 RAUSHNI-ESWT
               </span>
               <span className="block truncate text-xs font-semibold text-accent">
-                Educational & Social Welfare
+                {messages.dashboard.brandSubtitle}
               </span>
             </span>
           </Link>
@@ -63,7 +66,7 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
           <div className="relative w-full">
             <input
               type="search"
-              placeholder="Search…"
+              placeholder={messages.common.search}
               className="h-10 w-full rounded-lg border border-white/10 bg-white/10 py-2 pl-10 pr-4 text-sm text-white outline-none transition placeholder:text-white/45 focus:border-accent focus:ring-2 focus:ring-accent/30"
             />
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-accent/80" aria-hidden />
@@ -71,11 +74,13 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
+          <LanguageToggle variant="dashboard" showLabel={false} className="hidden sm:inline-flex" />
+
           <button
             type="button"
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="rounded-lg border border-white/10 bg-white/5 p-2 text-white transition-colors hover:bg-white/10"
-            aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+            aria-label={sidebarOpen ? messages.common.closeSidebar : messages.common.openSidebar}
           >
             {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -83,7 +88,7 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
           <button
             type="button"
             className="relative rounded-lg border border-white/10 bg-white/5 p-2 text-white transition-colors hover:bg-white/10"
-            aria-label="Notifications"
+            aria-label={messages.common.notifications}
           >
             <Bell size={20} />
             <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-accent" />
@@ -103,7 +108,7 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
               </span>
               {readOnly && (
                 <span className="hidden rounded-full border border-accent/30 bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent lg:inline">
-                  Read only
+                  {messages.common.readOnly}
                 </span>
               )}
               <ChevronDown size={16} className="hidden md:block" />
@@ -114,7 +119,7 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
                 <div className="px-4 py-2 text-xs text-white/55">
                   <p className="font-semibold text-white">{displayUser.email}</p>
                   <p className="text-accent">
-                    {readOnly ? 'Guest read-only access' : `${displayUser.role} access`}
+                    {readOnly ? messages.common.guestReadOnly : `${displayUser.role} access`}
                   </p>
                 </div>
                 <hr className="my-1 border-white/10" />
@@ -122,14 +127,17 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
                   href="/profile"
                   className="flex items-center gap-3 px-4 py-2 text-sm text-white/75 hover:bg-white/10 hover:text-accent"
                 >
-                  <User size={16} /> Profile
+                  <User size={16} /> {messages.common.profile}
                 </Link>
                 <Link
                   href="/settings"
                   className="flex items-center gap-3 px-4 py-2 text-sm text-white/75 hover:bg-white/10 hover:text-accent"
                 >
-                  <Settings size={16} /> Settings
+                  <Settings size={16} /> {messages.common.settings}
                 </Link>
+                <div className="px-3 py-2 sm:hidden">
+                  <LanguageToggle variant="dashboard" className="w-full" />
+                </div>
                 <hr className="my-1 border-white/10" />
                 <button
                   type="button"
@@ -139,7 +147,7 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
                   }}
                   className="flex w-full items-center gap-3 px-4 py-2 text-sm text-red-200 hover:bg-white/10"
                 >
-                  <LogOut size={16} /> Logout
+                  <LogOut size={16} /> {messages.common.logout}
                 </button>
               </div>
             )}
