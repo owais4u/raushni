@@ -25,6 +25,7 @@ export default function AppShell({
     pathname?.startsWith("/verify-email");
   const isPublicRoute =
     pathname === "/" ||
+    pathname?.startsWith("/platform") ||
     pathname?.startsWith("/about") ||
     pathname?.startsWith("/activities") ||
     pathname?.startsWith("/blog") ||

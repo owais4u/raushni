@@ -20,9 +20,16 @@ from app.services.designation_service import DesignationService
 from app.services.donation_service import DonationService
 from app.services.internship_service import InternshipService
 from app.services.member_service import MemberService
+from app.services.organization_service import OrganizationService
 from app.services.project_service import ProjectService
 from app.services.settings_service import SettingsService, UserAccountStore
 from app.services.simple_crud_service import SimpleCrudService
+
+
+def get_organization_service(
+    session: AsyncSession = Depends(get_db),
+) -> OrganizationService:
+    return OrganizationService(session)
 
 
 def get_member_service(

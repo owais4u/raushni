@@ -101,6 +101,7 @@ export const defaultSiteSettings: CmsSiteSettings = {
     { label: "Gallery", href: "/gallery" },
     { label: "Events", href: "/events" },
     { label: "Careers", href: "/careers" },
+    { label: "Platform SaaS", href: "/platform" },
     { label: "Admin Login", href: "/login" },
   ],
   socialLinks: [

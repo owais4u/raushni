@@ -18,6 +18,7 @@ from app.api.v1.endpoints import (
     landing,
     members,
     news,
+    organizations,
     projects,
     settings,
     webhooks,
@@ -39,6 +40,7 @@ api_router.include_router(internships.router)
 api_router.include_router(landing.router)
 api_router.include_router(members.router)
 api_router.include_router(news.router)
+api_router.include_router(organizations.router)
 api_router.include_router(projects.router)
 api_router.include_router(settings.router)
 api_router.include_router(webhooks.router)

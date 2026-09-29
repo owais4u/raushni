@@ -9,6 +9,7 @@ import LanguageToggle from "@/components/Common/LanguageToggle";
 import { DEFAULT_ADMIN_USER, DEFAULT_STAFF_USER, setStoredUser } from "@/lib/auth/permissions";
 import { safeCallbackUrl } from "@/lib/auth/safe-callback-url";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
+import { getBrowserTenantSlug } from "@/lib/tenant";
 
 export default function LoginForm() {
   const { messages } = useLocale();
@@ -19,6 +20,7 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const tenantSlug = getBrowserTenantSlug();
 
   const login = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -27,6 +29,7 @@ export default function LoginForm() {
     const result = await signIn("credentials", {
       email,
       password,
+      tenantSlug,
       redirect: false,
       callbackUrl,
     });
@@ -72,6 +75,9 @@ export default function LoginForm() {
           </div>
         </div>
         <p className="mt-4 text-sm leading-6 text-stone-600">{messages.auth.signInHint}</p>
+        <p className="mt-2 text-xs font-semibold text-amber-800">
+          Tenant: <span className="font-mono">{tenantSlug}</span>
+        </p>
 
         {status === "authenticated" && (
           <div className="mt-5 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">

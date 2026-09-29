@@ -30,6 +30,20 @@ Next.js middleware  →  BFF (api/v1, cms/api)  →  FastAPI require_organizatio
 
 Trusted headers (`X-Tenant-Slug`, later `X-Organization-Id`) are set by the BFF/middleware after host resolution. The API resolves slug → org id server-side; never trust a raw client org id for writes without membership checks.
 
+## Tenant provisioning (product)
+
+| Path | Purpose |
+| --- | --- |
+| `POST /api/v1/organizations` | Create org + default `platform_settings` + ADMIN membership (requires `INTERNAL_API_KEY`). |
+| `POST /api/v1/organizations/current/memberships` | Invite staff/admin to the current tenant (org admin). |
+| `GET /api/v1/organizations/current` | Return the resolved tenant org. |
+| Next.js `/api/platform/tenants` | Public SaaS signup BFF (rate-limited; holds service key server-side). |
+| `/platform` | Platform marketing landing. |
+| `/register` | Start-organization form. |
+| `scripts/provision-tenant.sh` | Ops CLI for the same API. |
+
+After provisioning, seed CMS rows for the new `tenantSlug` and point `{slug}.raushni.com` at the frontend ingress.
+
 ## CMS keying
 
 - **One Strapi instance.**

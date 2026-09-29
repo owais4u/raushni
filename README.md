@@ -7,37 +7,40 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-009688)](https://fastapi.tiangolo.com/)
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED)](https://www.docker.com/)
 
-Raushni is a digital operations platform for Raushni Educational & Social Welfare Trust. It brings public outreach, beneficiary records, donations, events, reports, document generation, and content publishing into one maintainable system for nonprofit operations.
+Raushni is a **multi-tenant SaaS platform** for educational and social welfare NGOs. Each organization runs as an isolated tenant (slug, memberships, branding, donations, CMS content) on a shared Next.js + FastAPI + Strapi + Postgres stack.
 
-The repository is organized as a full-stack platform with a Next.js frontend, FastAPI backend, Strapi CMS, PostgreSQL database, Redis cache, PDF/document generation utilities, nginx, Docker Compose, and Kubernetes manifests.
+The default seeded tenant is **Raushni Educational & Social Welfare Trust** (`raushni`). Additional NGOs provision via `/platform` → `/register` or `scripts/provision-tenant.sh`, then serve on `{slug}.raushni.com`.
 
-Local Docker: [docs/LOCAL_DEV.md](docs/LOCAL_DEV.md). Security (hosted): [docs/SECURITY.md](docs/SECURITY.md). Multi-tenant: [docs/MULTI_TENANT.md](docs/MULTI_TENANT.md). Deferred work: [docs/DEFERRED.md](docs/DEFERRED.md).
+The repository is organized as a full-stack platform with a Next.js frontend, FastAPI backend, Strapi CMS, PostgreSQL database, Redis cache, PDF/document generation utilities, nginx, Docker Compose, and Kubernetes manifests (including the `aws-saas` overlay).
+
+Local Docker: [docs/LOCAL_DEV.md](docs/LOCAL_DEV.md). Security (hosted): [docs/SECURITY.md](docs/SECURITY.md). Multi-tenant SaaS: [docs/MULTI_TENANT.md](docs/MULTI_TENANT.md). AWS SaaS: [docs/deployment/aws-saas-eks.md](docs/deployment/aws-saas-eks.md). Deferred work: [docs/DEFERRED.md](docs/DEFERRED.md).
 
 ## Product Scope
 
-Raushni is designed to support the day-to-day workflows of an educational and social welfare organization:
-
 | Area | Capabilities |
 | --- | --- |
-| Public website | About, activities, events, news, gallery, careers, volunteer, contact, and donation pages. |
-| Dashboard | Modules for members, beneficiaries, donations, certificates, crowdfunding, internships, projects, enquiries, reports, news, activities, and settings. |
+| SaaS tenancy | Org provisioning, host → `X-Tenant-Slug`, membership roles, org-scoped data and CMS `tenantSlug`. |
+| Public website | Per-tenant about, activities, events, news, gallery, careers, volunteer, contact, and donation pages. |
+| Dashboard | Modules for members, beneficiaries, donations, certificates, crowdfunding, internships, projects, enquiries, news, activities, and settings. |
 | Document generation | Member ID cards, donation receipts, certificates, appointment letters, QR codes, and PDF templates. |
-| CMS | Content management through Strapi for public-facing pages and media workflows. |
-| Operations | PostgreSQL persistence, Redis cache, backups, migrations, Dockerized local stack, and Kubernetes deployment manifests. |
+| CMS | Strapi content keyed by `tenantSlug` for public-facing pages and media workflows. |
+| Operations | PostgreSQL persistence, Redis cache, backups, migrations, Dockerized local stack, and Kubernetes (`aws-saas` overlay). |
+
+Platform marketing: `/platform`. Tenant signup: `/register`.
 
 ## Architecture
 
 ```text
-User
-  |
-  v
-Next.js Frontend  <---->  Strapi CMS
+Host / X-Tenant-Slug
+        │
+        ▼
+Next.js Frontend  <---->  Strapi CMS (tenantSlug)
   |
   v
 FastAPI Backend  <---->  Redis
   |
   v
-PostgreSQL
+PostgreSQL (organization_id row scope)
   |
   v
 Document and PDF Services

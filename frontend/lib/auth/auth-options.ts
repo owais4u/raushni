@@ -6,18 +6,21 @@ import {
   authCredentialsRequired,
   isPlaceholderCredential,
 } from "@/lib/auth/safe-callback-url";
-import { DEFAULT_TENANT_SLUG } from "@/lib/tenant";
+import { DEFAULT_TENANT_SLUG, normalizeTenantSlug } from "@/lib/tenant";
 
 const adminEmail = (process.env.NEXTAUTH_ADMIN_EMAIL || "").trim() || "admin@raushni.com";
 const adminPassword = (process.env.NEXTAUTH_ADMIN_PASSWORD || "").trim();
 const staffEmail = (process.env.NEXTAUTH_STAFF_EMAIL || "").trim() || "staff@raushni.com";
 const staffPassword = (process.env.NEXTAUTH_STAFF_PASSWORD || "").trim();
 
-/** Env credential users are seeded as raushni memberships; membership API is thin in Wave 2. */
-function defaultTenantClaims() {
+function tenantClaimsFromCredentials(tenantSlugRaw?: string) {
+  const tenantSlug = normalizeTenantSlug(tenantSlugRaw || DEFAULT_TENANT_SLUG);
   return {
-    tenantSlug: DEFAULT_TENANT_SLUG,
-    organizationId: (process.env.DEFAULT_ORGANIZATION_ID || "").trim() || undefined,
+    tenantSlug,
+    organizationId:
+      tenantSlug === DEFAULT_TENANT_SLUG
+        ? (process.env.DEFAULT_ORGANIZATION_ID || "").trim() || undefined
+        : undefined,
   };
 }
 
@@ -28,11 +31,14 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        tenantSlug: { label: "Tenant", type: "text" },
       },
       async authorize(credentials) {
         const email = credentials?.email?.trim().toLowerCase();
         const password = credentials?.password ?? "";
-        const tenant = defaultTenantClaims();
+        const tenant = tenantClaimsFromCredentials(
+          typeof credentials?.tenantSlug === "string" ? credentials.tenantSlug : undefined,
+        );
         const requireCreds = authCredentialsRequired();
 
         if (requireCreds) {
@@ -48,7 +54,7 @@ export const authOptions: NextAuthOptions = {
           password === adminPassword
         ) {
           return {
-            id: "raushni-admin",
+            id: `${tenant.tenantSlug}-admin`,
             name: "Admin User",
             email: adminEmail,
             role: "ADMIN",
@@ -63,7 +69,7 @@ export const authOptions: NextAuthOptions = {
           password === staffPassword
         ) {
           return {
-            id: "raushni-staff",
+            id: `${tenant.tenantSlug}-staff`,
             name: "Staff User",
             email: staffEmail,
             role: "STAFF",

@@ -67,6 +67,19 @@ def require_service_key(
         )
 
 
+def require_service_key_always(
+    x_api_key: str | None = Header(default=None, alias="X-API-Key"),
+    authorization: str | None = Header(default=None),
+) -> None:
+    """Always require INTERNAL_API_KEY (tenant provisioning / platform ops)."""
+    provided = _extract_api_key(x_api_key, authorization)
+    if not _api_key_valid(provided):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Valid service API key is required.",
+        )
+
+
 async def get_current_organization(
     _service_key: None = Depends(require_service_key),
     session: AsyncSession = Depends(get_db),
