@@ -84,32 +84,44 @@ HOSTS
 secret() {
   need kubectl
   kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
+  # Keep defaults aligned with existing local PVCs; '@' in passwords must be URI-encoded.
+  local postgres_password="${POSTGRES_PASSWORD:-ChangeMe@12345}"
+  local redis_password="${REDIS_PASSWORD:-ChangeMe@12345}"
+  local postgres_user="${POSTGRES_USER:-raushni_admin}"
+  local postgres_password_uri
+  postgres_password_uri="$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=""))' "$postgres_password")"
+  local redis_password_uri
+  redis_password_uri="$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=""))' "$redis_password")"
+  local backend_database_url="${BACKEND_DATABASE_URL:-postgresql+asyncpg://${postgres_user}:${postgres_password_uri}@postgres:5432/raushni_backend}"
+  local redis_url="${REDIS_URL:-redis://:${redis_password_uri}@redis:6379}"
   kubectl -n "$NAMESPACE" create secret generic raushni-secrets \
-    --from-literal=POSTGRES_USER="${POSTGRES_USER:-raushni_admin}" \
-    --from-literal=POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-ChangeMe@12345}" \
-    --from-literal=BACKEND_DATABASE_URL="${BACKEND_DATABASE_URL:-postgresql+asyncpg://raushni_admin:ChangeMe@12345@postgres:5432/raushni_backend}" \
+    --from-literal=POSTGRES_USER="$postgres_user" \
+    --from-literal=POSTGRES_PASSWORD="$postgres_password" \
+    --from-literal=BACKEND_DATABASE_URL="$backend_database_url" \
     --from-literal=CMS_DATABASE_NAME="${CMS_DATABASE_NAME:-raushni_cms}" \
     --from-literal=CMS_DATABASE_HOST="${CMS_DATABASE_HOST:-postgres}" \
     --from-literal=CMS_DATABASE_PORT="${CMS_DATABASE_PORT:-5432}" \
     --from-literal=CMS_DATABASE_USERNAME="${CMS_DATABASE_USERNAME:-raushni_admin}" \
-    --from-literal=CMS_DATABASE_PASSWORD="${CMS_DATABASE_PASSWORD:-ChangeMe@12345}" \
+    --from-literal=CMS_DATABASE_PASSWORD="${CMS_DATABASE_PASSWORD:-$postgres_password}" \
     --from-literal=CMS_DATABASE_SSL="${CMS_DATABASE_SSL:-false}" \
-    --from-literal=REDIS_PASSWORD="${REDIS_PASSWORD:-ChangeMe@12345}" \
-    --from-literal=REDIS_URL="${REDIS_URL:-redis://:ChangeMe@12345@redis:6379}" \
-    --from-literal=NEXTAUTH_SECRET="${NEXTAUTH_SECRET:-ChangeMeNextAuthSecret123456789}" \
+    --from-literal=REDIS_PASSWORD="$redis_password" \
+    --from-literal=REDIS_URL="$redis_url" \
+    --from-literal=NEXTAUTH_SECRET="${NEXTAUTH_SECRET:-LocalDevNextAuthSecretValue_32charsMin}" \
     --from-literal=NEXTAUTH_ADMIN_EMAIL="${NEXTAUTH_ADMIN_EMAIL:-admin@raushni.com}" \
-    --from-literal=NEXTAUTH_ADMIN_PASSWORD="${NEXTAUTH_ADMIN_PASSWORD:-ChangeMe@12345}" \
+    --from-literal=NEXTAUTH_ADMIN_PASSWORD="${NEXTAUTH_ADMIN_PASSWORD:-LocalDevAdminPass123}" \
     --from-literal=NEXTAUTH_STAFF_EMAIL="${NEXTAUTH_STAFF_EMAIL:-staff@raushni.com}" \
-    --from-literal=NEXTAUTH_STAFF_PASSWORD="${NEXTAUTH_STAFF_PASSWORD:-ChangeMe@12345}" \
-    --from-literal=STRIPE_SECRET_KEY="${STRIPE_SECRET_KEY:-sk_test_change_me}" \
-    --from-literal=STRIPE_PUBLISHABLE_KEY="${STRIPE_PUBLISHABLE_KEY:-pk_test_change_me}" \
-    --from-literal=STRIPE_WEBHOOK_SECRET="${STRIPE_WEBHOOK_SECRET:-whsec_change_me}" \
+    --from-literal=NEXTAUTH_STAFF_PASSWORD="${NEXTAUTH_STAFF_PASSWORD:-LocalDevStaffPass123}" \
+    --from-literal=STRIPE_SECRET_KEY="${STRIPE_SECRET_KEY:-sk_test_local_dev_not_for_prod}" \
+    --from-literal=STRIPE_PUBLISHABLE_KEY="${STRIPE_PUBLISHABLE_KEY:-pk_test_local_dev_not_for_prod}" \
+    --from-literal=STRIPE_WEBHOOK_SECRET="${STRIPE_WEBHOOK_SECRET:-whsec_local_dev_not_for_prod}" \
     --from-literal=STRAPI_APP_KEYS="${STRAPI_APP_KEYS:-key1,key2,key3,key4}" \
-    --from-literal=STRAPI_API_TOKEN_SALT="${STRAPI_API_TOKEN_SALT:-ChangeMeApiTokenSalt}" \
-    --from-literal=STRAPI_ADMIN_JWT_SECRET="${STRAPI_ADMIN_JWT_SECRET:-ChangeMeAdminJwtSecret}" \
-    --from-literal=STRAPI_JWT_SECRET="${STRAPI_JWT_SECRET:-ChangeMeJwtSecret}" \
-    --from-literal=STRAPI_TRANSFER_TOKEN_SALT="${STRAPI_TRANSFER_TOKEN_SALT:-ChangeMeTransferSalt}" \
-    --from-literal=DD_API_KEY="${DD_API_KEY:-change-me}" \
+    --from-literal=STRAPI_API_TOKEN_SALT="${STRAPI_API_TOKEN_SALT:-LocalDevApiTokenSaltValue}" \
+    --from-literal=STRAPI_ADMIN_JWT_SECRET="${STRAPI_ADMIN_JWT_SECRET:-LocalDevAdminJwtSecretValue}" \
+    --from-literal=STRAPI_JWT_SECRET="${STRAPI_JWT_SECRET:-LocalDevJwtSecretValue123}" \
+    --from-literal=STRAPI_TRANSFER_TOKEN_SALT="${STRAPI_TRANSFER_TOKEN_SALT:-LocalDevTransferSaltValue}" \
+    --from-literal=INTERNAL_API_KEY="${INTERNAL_API_KEY:-LocalDevInternalApiKey_32chars_min}" \
+    --from-literal=CMS_API_TOKEN="${CMS_API_TOKEN:-LocalDevCmsApiTokenValue_32chars_min}" \
+    --from-literal=DD_API_KEY="${DD_API_KEY:-local-dev-dd-key}" \
     --dry-run=client -o yaml | kubectl apply -f -
 }
 
