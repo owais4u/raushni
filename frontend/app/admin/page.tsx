@@ -4,6 +4,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/auth-options";
 import { canAdmin } from "@/lib/auth/permissions";
 
+export const dynamic = "force-dynamic";
+
 /**
  * Site /admin is not Strapi — it requires dashboard login, then sends
  * admins to the CMS editor (or staff to the in-app CMS page).

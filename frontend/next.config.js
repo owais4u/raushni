@@ -6,6 +6,47 @@ const pwaPlugin = (nextPwa.default || nextPwa)({
   skipWaiting: true,
 });
 
+/**
+ * Empty-string env vars (common after a bad Vercel sync) break NextAuth at
+ * module load: `new URL("")` → Invalid URL during prerender.
+ * Prefer an explicit public URL, then the platform VERCEL_URL.
+ */
+function firstHttpUrl(...candidates) {
+  for (const raw of candidates) {
+    const value = typeof raw === 'string' ? raw.trim() : '';
+    if (!value || value === '[SENSITIVE]') continue;
+    if (/^https?:\/\//i.test(value)) return value.replace(/\/$/, '');
+  }
+  return undefined;
+}
+
+function ensureAuthPublicUrl() {
+  const resolved = firstHttpUrl(
+    process.env.NEXTAUTH_URL,
+    process.env.APP_PUBLIC_URL,
+    process.env.NEXT_PUBLIC_APP_URL,
+    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined,
+  );
+  if (resolved) {
+    process.env.NEXTAUTH_URL = resolved;
+    if (!firstHttpUrl(process.env.APP_PUBLIC_URL)) {
+      process.env.APP_PUBLIC_URL = resolved;
+    }
+  }
+}
+
+ensureAuthPublicUrl();
+
+function resolveApiRewriteBase() {
+  return (
+    firstHttpUrl(
+      process.env.API_INTERNAL_URL,
+      process.env.NEXT_PUBLIC_API_URL,
+      process.env.NEXT_PUBLIC_PYTHON_URL,
+    ) || 'http://127.0.0.1:8000'
+  );
+}
+
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
@@ -27,7 +68,7 @@ const nextConfig = {
   },
 
   async rewrites() {
-    const apiUrl = process.env.API_INTERNAL_URL || process.env.NEXT_PUBLIC_API_URL || 'http://backend:8000';
+    const apiUrl = resolveApiRewriteBase();
 
     // /api/auth/* → NextAuth
     // /api/v1/* → BFF Route Handler

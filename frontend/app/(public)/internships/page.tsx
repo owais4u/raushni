@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 
-export default function Page() {
+export const dynamic = "force-dynamic";
+
+export default function InternshipsRedirectPage() {
   redirect("/internship-registration");
 }
