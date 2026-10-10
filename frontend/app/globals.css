@@ -252,17 +252,6 @@ html[data-public-theme="dark"] .public-site .public-footer-accent {
   color: #fcd34d;
 }
 
-html[data-public-theme="dark"] .public-site .public-footer-icon {
-  border-color: rgba(255, 255, 255, 0.1);
-  background-color: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.75);
-}
-
-html[data-public-theme="dark"] .public-site .public-footer-icon:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #fcd34d;
-}
-
 html[data-public-theme="dark"] .public-site .public-footer-input {
   border-color: rgba(255, 255, 255, 0.1);
   background-color: rgba(255, 255, 255, 0.1);

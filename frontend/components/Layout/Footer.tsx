@@ -52,8 +52,6 @@ type CmsCollectionResponse = {
 const footerStyles = {
   heading: "public-footer-heading text-sm font-bold uppercase tracking-[0.18em] text-amber-700",
   link: "public-footer-link whitespace-normal break-words text-sm font-medium leading-tight text-stone-700 transition hover:text-amber-800 focus:outline-none focus:text-amber-800",
-  iconLink:
-    "public-footer-icon inline-flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-stone-50 text-stone-700 transition hover:-translate-y-0.5 hover:border-amber-300 hover:bg-amber-50 hover:text-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:ring-offset-2",
   primaryButton:
     "inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-amber-400 px-5 text-sm font-bold text-stone-950 shadow-sm shadow-amber-900/10 transition hover:-translate-y-0.5 hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:ring-offset-2",
   input:
@@ -131,16 +129,21 @@ function linkLabel(link: FooterLink): string {
 
 function SocialGlyph({ children }: { children: ReactNode }) {
   return (
-    <svg viewBox="0 0 24 24" width={18} height={18} fill="currentColor" aria-hidden>
+    <svg viewBox="0 0 24 24" width={20} height={20} fill="currentColor" aria-hidden className="relative z-[1] drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]">
       {children}
     </svg>
   );
 }
 
-const socialLinks: Array<{ name: string; href: string; icon: ReactNode }> = [
+const socialLinkBase =
+  "group relative inline-flex h-11 w-11 items-center justify-center overflow-hidden rounded-full text-white transition duration-300 ease-out will-change-transform hover:-translate-y-1 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:translate-y-0 active:scale-100";
+
+const socialLinks: Array<{ name: string; href: string; className: string; icon: ReactNode }> = [
   {
     name: "Facebook",
     href: "https://www.facebook.com/profile.php?id=61563690991747",
+    className:
+      `${socialLinkBase} bg-gradient-to-br from-[#5b9bff] via-[#1877F2] to-[#0b5fcc] shadow-[0_8px_18px_rgba(24,119,242,0.45),inset_0_1px_0_rgba(255,255,255,0.45),inset_0_-3px_6px_rgba(0,0,0,0.22)] hover:shadow-[0_12px_24px_rgba(24,119,242,0.55),inset_0_1px_0_rgba(255,255,255,0.5)] focus-visible:ring-[#1877F2]`,
     icon: (
       <SocialGlyph>
         <path d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v2H9v3h2v7h3v-7h2.6L17 11h-3V9c0-.6.4-1 1-1z" />
@@ -150,6 +153,8 @@ const socialLinks: Array<{ name: string; href: string; icon: ReactNode }> = [
   {
     name: "Twitter",
     href: "https://X.com/",
+    className:
+      `${socialLinkBase} bg-gradient-to-br from-[#3d3d3d] via-[#111111] to-[#000000] shadow-[0_8px_18px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.28),inset_0_-3px_6px_rgba(0,0,0,0.35)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.35)] focus-visible:ring-stone-700`,
     icon: (
       <SocialGlyph>
         <path d="M18.2 4H21l-6.5 7.4L22 20h-5.6l-4.4-5.5L7 20H4.2l7-8L2 4h5.7l4 5.1L18.2 4zm-1 14.5h1.6L7 5.4H5.3L17.2 18.5z" />
@@ -159,6 +164,8 @@ const socialLinks: Array<{ name: string; href: string; icon: ReactNode }> = [
   {
     name: "Instagram",
     href: "https://instagram.com/",
+    className:
+      `${socialLinkBase} bg-[radial-gradient(circle_at_30%_30%,#feda75_0%,#fa7e1e_28%,#d62976_55%,#962fbf_78%,#4f5bd5_100%)] shadow-[0_8px_18px_rgba(214,41,118,0.45),inset_0_1px_0_rgba(255,255,255,0.45),inset_0_-3px_6px_rgba(0,0,0,0.22)] hover:shadow-[0_12px_24px_rgba(214,41,118,0.55),inset_0_1px_0_rgba(255,255,255,0.5)] focus-visible:ring-[#d62976]`,
     icon: (
       <SocialGlyph>
         <path d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4zm5 4.5A4.5 4.5 0 1 0 16.5 12 4.5 4.5 0 0 0 12 7.5zm0 7.2A2.7 2.7 0 1 1 14.7 12 2.7 2.7 0 0 1 12 14.7zm5.2-8.6a1.05 1.05 0 1 0 1.05 1.05A1.05 1.05 0 0 0 17.2 6.1z" />
@@ -168,6 +175,8 @@ const socialLinks: Array<{ name: string; href: string; icon: ReactNode }> = [
   {
     name: "LinkedIn",
     href: "https://linkedin.com/company/",
+    className:
+      `${socialLinkBase} bg-gradient-to-br from-[#5bb7ff] via-[#0A66C2] to-[#004182] shadow-[0_8px_18px_rgba(10,102,194,0.45),inset_0_1px_0_rgba(255,255,255,0.45),inset_0_-3px_6px_rgba(0,0,0,0.22)] hover:shadow-[0_12px_24px_rgba(10,102,194,0.55),inset_0_1px_0_rgba(255,255,255,0.5)] focus-visible:ring-[#0A66C2]`,
     icon: (
       <SocialGlyph>
         <path d="M6.5 9.5H3.7V20h2.8V9.5zM5.1 4A1.6 1.6 0 1 0 5.1 7.2 1.6 1.6 0 0 0 5.1 4zM20.3 13.2c0-3.1-1.7-4.5-3.9-4.5a3.4 3.4 0 0 0-3 1.6V9.5H10.6V20h2.8v-5.6c0-1.5.3-2.9 2.1-2.9s1.8 1.7 1.8 3V20h2.8v-6.8z" />
@@ -177,6 +186,8 @@ const socialLinks: Array<{ name: string; href: string; icon: ReactNode }> = [
   {
     name: "YouTube",
     href: "https://youtube.com/",
+    className:
+      `${socialLinkBase} bg-gradient-to-br from-[#ff6b6b] via-[#FF0000] to-[#b00000] shadow-[0_8px_18px_rgba(255,0,0,0.42),inset_0_1px_0_rgba(255,255,255,0.45),inset_0_-3px_6px_rgba(0,0,0,0.22)] hover:shadow-[0_12px_24px_rgba(255,0,0,0.52),inset_0_1px_0_rgba(255,255,255,0.5)] focus-visible:ring-[#FF0000]`,
     icon: (
       <SocialGlyph>
         <path d="M21.6 7.2a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.7.5A2.7 2.7 0 0 0 2.4 7.2 28 28 0 0 0 2 12a28 28 0 0 0 .4 4.8 2.7 2.7 0 0 0 1.9 1.9c1.7.5 7.7.5 7.7.5s6 0 7.7-.5a2.7 2.7 0 0 0 1.9-1.9A28 28 0 0 0 22 12a28 28 0 0 0-.4-4.8zM10 15.5v-7l6 3.5-6 3.5z" />
@@ -272,8 +283,12 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.name}
-                  className={footerStyles.iconLink}
+                  className={social.className}
                 >
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 bg-[linear-gradient(145deg,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0.12)_38%,rgba(255,255,255,0)_58%)] opacity-90 transition group-hover:opacity-100"
+                  />
                   {social.icon}
                 </a>
               ))}
