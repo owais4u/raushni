@@ -256,7 +256,7 @@ export default function Footer() {
               <img
                 src={content.logo}
                 alt={content.title ? `${content.title} logo` : "Organization logo"}
-                className="h-14 w-14 rounded-full object-contain ring-2 ring-stone-200"
+                className="h-30 w-40 rounded-full object-contain ring-2 ring-stone-200"
               />
             </Link>
 
