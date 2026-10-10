@@ -39,17 +39,17 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
 
   return (
     <header
-      className={`fixed top-0 right-0 left-0 z-50 h-16 border-b border-white/10 bg-brand/95 text-white backdrop-blur-xl transition-shadow duration-300 ${
+      className={`fixed top-0 right-0 left-0 z-50 min-h-[calc(1.5in+1rem)] border-b border-white/10 bg-brand/95 text-white backdrop-blur-xl transition-shadow duration-300 ${
         scrolled ? 'shadow-lg shadow-black/20' : 'shadow-sm shadow-black/10'
       }`}
     >
-      <div className="flex h-full items-center justify-between gap-3 px-4 lg:px-6">
+      <div className="flex h-full items-center justify-between gap-3 px-4 py-2 lg:px-6">
         <div className="flex min-w-0 items-center gap-3">
           <Link href="/dashboard" className="flex min-w-0 items-center gap-3">
             <img
               src="/assets/brand/raushni-logo.png"
               alt="Raushni Educational and Social Welfare Trust logo"
-              className="h-10 w-10 shrink-0 rounded-full object-contain ring-2 ring-white/15"
+              className="h-[1.5in] w-[1.5in] shrink-0 rounded-full object-contain ring-2 ring-white/15"
             />
             <span className="hidden min-w-0 sm:block">
               <span className="block truncate text-sm font-black uppercase tracking-wide text-white">

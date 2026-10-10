@@ -54,7 +54,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
       )}
 
       <aside
-        className={`fixed top-16 right-0 h-[calc(100vh-4rem)] w-72 bg-white border-l border-stone-200 z-40 overflow-y-auto shadow-xl transition-transform duration-300 ${
+        className={`fixed top-[calc(1.5in+1rem)] right-0 h-[calc(100vh-(1.5in+1rem))] w-72 bg-white border-l border-stone-200 z-40 overflow-y-auto shadow-xl transition-transform duration-300 ${
           sidebarOpen ? 'translate-x-0' : 'translate-x-full'
         } lg:shadow-none`}
       >

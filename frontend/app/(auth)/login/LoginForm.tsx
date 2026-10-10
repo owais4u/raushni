@@ -65,9 +65,9 @@ export default function LoginForm() {
           <Image
             src="/assets/brand/raushni-logo.png"
             alt="Raushni logo"
-            width={48}
-            height={48}
-            className="rounded-full object-contain ring-2 ring-brand/10"
+            width={144}
+            height={144}
+            className="h-[1.5in] w-[1.5in] rounded-full object-contain ring-2 ring-brand/10"
           />
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Raushni</p>

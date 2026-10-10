@@ -74,7 +74,7 @@ export default function AppShell({
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
       <main
-        className={`mt-16 min-h-[calc(100vh-4rem)] transition-all duration-300 ${
+        className={`mt-[calc(1.5in+1rem)] min-h-[calc(100vh-(1.5in+1rem))] transition-all duration-300 ${
           isDashboardHome ? "bg-surface" : ""
         } ${sidebarOpen ? "lg:mr-72" : "lg:mr-0"}`}
       >
