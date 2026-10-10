@@ -253,11 +253,13 @@ export default function Footer() {
         <div className="grid gap-10 lg:grid-cols-[1.25fr_0.7fr_0.7fr_1fr]">
           <div>
             <Link href="/#top" className="inline-flex items-center gap-3">
-              <img
-                src={content.logo}
-                alt={content.title ? `${content.title} logo` : "Organization logo"}
-                className="h-30 w-40 rounded-full object-contain ring-2 ring-stone-200"
-              />
+              <span className="inline-flex h-[3in] w-[2in] shrink-0 items-center justify-center overflow-hidden rounded-[50%] bg-white ring-2 ring-stone-200">
+                <img
+                  src={content.logo}
+                  alt={content.title ? `${content.title} logo` : "Organization logo"}
+                  className="h-full w-full object-contain"
+                />
+              </span>
             </Link>
 
             <p className={`mt-5 max-w-sm ${footerStyles.muted}`}>{content.description}</p>
